@@ -27,15 +27,6 @@ class MovieRepository(
 
     private val tmdbService: TMDbService = ApiClient.getTMDbService()
 
-    // ============ BÚSQUEDA DE PELÍCULAS ============
-
-    /**
-     * Buscar películas en la API de TMDb
-     *
-     * @param query Término de búsqueda
-     * @param page Página de resultados
-     * @return Flow con el estado de la respuesta
-     */
     fun searchMovies(query: String, page: Int = 1): Flow<ApiResponse<List<Movie>>> = flow {
         emit(ApiResponse.Loading)
 
@@ -70,9 +61,6 @@ class MovieRepository(
         }
     }
 
-    /**
-     * Obtener películas populares
-     */
     fun getPopularMovies(page: Int = 1): Flow<ApiResponse<List<Movie>>> = flow {
         emit(ApiResponse.Loading)
 
@@ -98,14 +86,6 @@ class MovieRepository(
         }
     }
 
-    // ============ DETALLES DE PELÍCULA ============
-
-    /**
-     * Obtener detalles completos de una película
-     *
-     * @param movieId ID de la película
-     * @return Flow con el estado de la respuesta
-     */
     fun getMovieDetails(movieId: Int): Flow<ApiResponse<Movie>> = flow {
         emit(ApiResponse.Loading)
 
@@ -167,25 +147,14 @@ class MovieRepository(
         }
     }
 
-    // ============ BIBLIOTECA PERSONAL ============
-
-    /**
-     * Obtener películas de la biblioteca personal (como Flow para observar cambios)
-     */
     fun getLibraryMoviesFlow(): Flow<List<Movie>> {
         return movieDao.getLibraryMoviesFlow()
     }
 
-    /**
-     * Obtener películas de la biblioteca personal
-     */
     suspend fun getLibraryMovies(): List<Movie> {
         return movieDao.getLibraryMovies()
     }
 
-    /**
-     * Añadir película a la biblioteca personal
-     */
     suspend fun addToLibrary(movieId: Int): Boolean {
         return try {
             movieDao.addToLibrary(movieId)
@@ -195,9 +164,6 @@ class MovieRepository(
         }
     }
 
-    /**
-     * Quitar película de la biblioteca personal
-     */
     suspend fun removeFromLibrary(movieId: Int): Boolean {
         return try {
             movieDao.removeFromLibrary(movieId)
@@ -207,18 +173,10 @@ class MovieRepository(
         }
     }
 
-    /**
-     * Verificar si una película está en la biblioteca
-     */
     suspend fun isMovieInLibrary(movieId: Int): Boolean {
         return movieDao.isMovieInLibrary(movieId)
     }
 
-    // ============ RESEÑAS Y PUNTUACIONES ============
-
-    /**
-     * Actualizar puntuación del usuario
-     */
     suspend fun updateUserRating(movieId: Int, rating: Float): Boolean {
         return try {
             movieDao.updateUserRating(movieId, rating)
@@ -228,9 +186,6 @@ class MovieRepository(
         }
     }
 
-    /**
-     * Actualizar reseña del usuario
-     */
     suspend fun updateUserReview(movieId: Int, review: String?): Boolean {
         return try {
             movieDao.updateUserReview(movieId, review)
@@ -240,11 +195,6 @@ class MovieRepository(
         }
     }
 
-    // ============ ESTADÍSTICAS ============
-
-    /**
-     * Obtener estadísticas de la biblioteca
-     */
     suspend fun getLibraryStats(): LibraryStats {
         return LibraryStats(
             totalMovies = movieDao.getLibraryCount(),
@@ -254,9 +204,6 @@ class MovieRepository(
     }
 }
 
-/**
- * Data class para estadísticas de la biblioteca
- */
 data class LibraryStats(
     val totalMovies: Int,
     val averageRating: Double,

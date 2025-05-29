@@ -20,7 +20,7 @@
 
         <!-- Activity principal para pruebas de API -->
         <activity
-            android:name="com.movielib.ApiTestActivity"
+            android:name="com.movielib.app.ApiTestActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

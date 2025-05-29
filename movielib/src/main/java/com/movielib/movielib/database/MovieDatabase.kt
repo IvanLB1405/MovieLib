@@ -21,26 +21,14 @@ import com.movielib.movielib.models.Movie
 )
 abstract class MovieDatabase : RoomDatabase() {
 
-    /**
-     * Método abstracto que retorna el DAO
-     * Room implementará este método automáticamente
-     */
+
     abstract fun movieDao(): MovieDao
 
     companion object {
-        /**
-         * Instancia singleton de la base de datos
-         * @Volatile asegura que el valor sea visible para todos los threads
-         */
+
         @Volatile
         private var INSTANCE: MovieDatabase? = null
 
-        /**
-         * Obtiene la instancia de la base de datos (patrón Singleton)
-         *
-         * @param context Contexto de la aplicación
-         * @return Instancia de MovieDatabase
-         */
         fun getDatabase(context: Context): MovieDatabase {
             // Si la instancia no es null, la retorna
             // Si es null, sincroniza y crea una nueva instancia
@@ -57,17 +45,10 @@ abstract class MovieDatabase : RoomDatabase() {
             }
         }
 
-        /**
-         * Método para obtener la base de datos de forma asíncrona
-         * Útil para testing o casos especiales
-         */
         suspend fun getDatabaseAsync(context: Context): MovieDatabase {
             return getDatabase(context)
         }
 
-        /**
-         * Método para limpiar la instancia (útil para testing)
-         */
         fun closeDatabase() {
             INSTANCE?.close()
             INSTANCE = null

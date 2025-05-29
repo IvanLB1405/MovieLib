@@ -1,12 +1,15 @@
-package com.movielib
+package com.movielib.app
 
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.movielib.movielib.api.ApiResponse
 import com.movielib.movielib.repository.MovieRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 import com.movielib.movielib.database.MovieDatabase
+import com.movielib.movielib.utils.Constants
 
 class ApiTestActivity : AppCompatActivity() {
 
@@ -15,14 +18,21 @@ class ApiTestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Como no tienes MainActivity, usamos un layout simple o creamos la vista programáticamente
-        // Por ahora, no necesitamos layout para la prueba
+        // Crear un layout simple para mostrar que está funcionando
+        val textView = android.widget.TextView(this)
+        textView.text = "🚀 MovieLib API Test\n\n🔄 Ejecutando pruebas...\n\n📱 Revisa el Logcat para ver los resultados detallados\n\nFiltro: API_TEST"
+        textView.gravity = android.view.Gravity.CENTER
+        textView.textSize = 16f
+        textView.setPadding(32, 32, 32, 32)
+        setContentView(textView)
 
         Log.d("API_TEST", "🚀 ApiTestActivity iniciada")
 
         try {
             // Inicializar el repository (del módulo movielib)
-            movieRepository = MovieRepository(this)
+            val database = MovieDatabase.getDatabase(this)
+            val movieDao = database.movieDao()
+            movieRepository = MovieRepository(movieDao, Constants.TMDB_API_KEY)
             Log.d("API_TEST", "✅ MovieRepository inicializado correctamente")
 
             // Probar la API
@@ -61,15 +71,30 @@ class ApiTestActivity : AppCompatActivity() {
     private suspend fun testSearchMovies() {
         try {
             Log.d("API_TEST", "🔍 Probando búsqueda de películas...")
-            val movies = movieRepository.searchMovies("Avengers")
 
-            if (movies.isNotEmpty()) {
-                Log.d("API_TEST", "✅ Búsqueda exitosa! Encontradas ${movies.size} películas")
-                movies.take(3).forEach { movie ->
-                    Log.d("API_TEST", "🎬 ${movie.title} (${movie.releaseDate}) - Rating: ${movie.voteAverage}")
+            movieRepository.searchMovies("Avengers").collect { response ->
+                when (response) {
+                    is ApiResponse.Loading -> {
+                        Log.d("API_TEST", "🔄 Cargando búsqueda...")
+                    }
+                    is ApiResponse.Success -> {
+                        val movies = response.data
+                        if (movies.isNotEmpty()) {
+                            Log.d("API_TEST", "✅ Búsqueda exitosa! Encontradas ${movies.size} películas")
+                            movies.take(3).forEach { movie ->
+                                Log.d("API_TEST", "🎬 ${movie.title} (${movie.releaseDate}) - Rating: ${movie.voteAverage}")
+                            }
+                        } else {
+                            Log.w("API_TEST", "⚠️ No se encontraron películas en la búsqueda")
+                        }
+                    }
+                    is ApiResponse.Error -> {
+                        Log.e("API_TEST", "❌ Error en búsqueda: ${response.message}")
+                    }
+                    is ApiResponse.NetworkError -> {
+                        Log.e("API_TEST", "❌ Error de conexión en búsqueda")
+                    }
                 }
-            } else {
-                Log.w("API_TEST", "⚠️ No se encontraron películas en la búsqueda")
             }
 
         } catch (e: Exception) {
@@ -80,15 +105,30 @@ class ApiTestActivity : AppCompatActivity() {
     private suspend fun testPopularMovies() {
         try {
             Log.d("API_TEST", "🔥 Probando películas populares...")
-            val movies = movieRepository.getPopularMovies()
 
-            if (movies.isNotEmpty()) {
-                Log.d("API_TEST", "✅ Películas populares obtenidas! Total: ${movies.size}")
-                movies.take(3).forEach { movie ->
-                    Log.d("API_TEST", "🎬 ${movie.title} - Popularidad: ${movie.popularity}")
+            movieRepository.getPopularMovies().collect { response ->
+                when (response) {
+                    is ApiResponse.Loading -> {
+                        Log.d("API_TEST", "🔄 Cargando películas populares...")
+                    }
+                    is ApiResponse.Success -> {
+                        val movies = response.data
+                        if (movies.isNotEmpty()) {
+                            Log.d("API_TEST", "✅ Películas populares obtenidas! Total: ${movies.size}")
+                            movies.take(3).forEach { movie ->
+                                Log.d("API_TEST", "🎬 ${movie.title} - Rating: ${movie.voteAverage}")
+                            }
+                        } else {
+                            Log.w("API_TEST", "⚠️ No se encontraron películas populares")
+                        }
+                    }
+                    is ApiResponse.Error -> {
+                        Log.e("API_TEST", "❌ Error obteniendo películas populares: ${response.message}")
+                    }
+                    is ApiResponse.NetworkError -> {
+                        Log.e("API_TEST", "❌ Error de conexión obteniendo películas populares")
+                    }
                 }
-            } else {
-                Log.w("API_TEST", "⚠️ No se encontraron películas populares")
             }
 
         } catch (e: Exception) {
@@ -99,17 +139,28 @@ class ApiTestActivity : AppCompatActivity() {
     private suspend fun testMovieDetails() {
         try {
             Log.d("API_TEST", "🎭 Probando detalles de película específica...")
-            // Usar ID de una película conocida (Avengers: Endgame)
-            val movie = movieRepository.getMovieDetails(299534)
 
-            if (movie != null) {
-                Log.d("API_TEST", "✅ Detalles obtenidos exitosamente!")
-                Log.d("API_TEST", "🎬 Título: ${movie.title}")
-                Log.d("API_TEST", "📅 Fecha: ${movie.releaseDate}")
-                Log.d("API_TEST", "⭐ Rating: ${movie.voteAverage}")
-                Log.d("API_TEST", "📝 Resumen: ${movie.overview.take(100)}...")
-            } else {
-                Log.w("API_TEST", "⚠️ No se pudieron obtener los detalles de la película")
+            // Usar ID de una película conocida (Avengers: Endgame)
+            movieRepository.getMovieDetails(299534).collect { response ->
+                when (response) {
+                    is ApiResponse.Loading -> {
+                        Log.d("API_TEST", "🔄 Cargando detalles de película...")
+                    }
+                    is ApiResponse.Success -> {
+                        val movie = response.data
+                        Log.d("API_TEST", "✅ Detalles obtenidos exitosamente!")
+                        Log.d("API_TEST", "🎬 Título: ${movie.title}")
+                        Log.d("API_TEST", "📅 Fecha: ${movie.releaseDate}")
+                        Log.d("API_TEST", "⭐ Rating: ${movie.voteAverage}")
+                        Log.d("API_TEST", "📝 Resumen: ${movie.overview?.take(100) ?: "Sin resumen"}...")
+                    }
+                    is ApiResponse.Error -> {
+                        Log.e("API_TEST", "❌ Error obteniendo detalles: ${response.message}")
+                    }
+                    is ApiResponse.NetworkError -> {
+                        Log.e("API_TEST", "❌ Error de conexión obteniendo detalles")
+                    }
+                }
             }
 
         } catch (e: Exception) {
@@ -121,22 +172,22 @@ class ApiTestActivity : AppCompatActivity() {
         try {
             Log.d("API_TEST", "💾 Probando base de datos local...")
 
-            // Obtener todas las películas de la base de datos
-            val localMovies = movieRepository.getAllMovies()
-            Log.d("API_TEST", "📊 Películas en base de datos local: ${localMovies.size}")
+            // Obtener todas las películas de la biblioteca (si existen estos métodos)
+            val libraryMovies = movieRepository.getLibraryMovies()
+            Log.d("API_TEST", "📊 Películas en biblioteca: ${libraryMovies.size}")
 
-            // Obtener favoritas
-            val favorites = movieRepository.getFavoriteMovies()
-            Log.d("API_TEST", "❤️ Películas favoritas: ${favorites.size}")
-
-            if (localMovies.isNotEmpty()) {
+            if (libraryMovies.isNotEmpty()) {
                 Log.d("API_TEST", "✅ Base de datos local funcionando correctamente")
-                localMovies.take(3).forEach { movie ->
-                    Log.d("API_TEST", "💾 Local: ${movie.title} - Favorito: ${movie.isFavorite}")
+                libraryMovies.take(3).forEach { movie ->
+                    Log.d("API_TEST", "💾 Local: ${movie.title} - En biblioteca: ${movie.isInLibrary}")
                 }
             } else {
                 Log.d("API_TEST", "ℹ️ Base de datos local vacía (normal en primera ejecución)")
             }
+
+            // Obtener estadísticas de la biblioteca
+            val stats = movieRepository.getLibraryStats()
+            Log.d("API_TEST", "📈 Estadísticas - Total: ${stats.totalMovies}, Rating promedio: ${stats.averageRating}, Con reseñas: ${stats.moviesWithReviews}")
 
         } catch (e: Exception) {
             Log.e("API_TEST", "❌ Error en base de datos local: ${e.message}", e)
