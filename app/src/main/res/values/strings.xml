@@ -1,3 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MovieLib</string>
+
+    <!-- Main Activity -->
+    <string name="popular_movies">Popular</string>
+    <string name="top_rated_movies">Top Rated</string>
+    <string name="upcoming_movies">Upcoming</string>
+    <string name="now_playing_movies">Now Playing</string>
+    <string name="search_hint">Search movies...</string>
+    <string name="favorites">My List</string>
+
+    <!-- Movie Detail -->
+    <string name="play">Play</string>
+    <string name="add_to_list">+ My List</string>
+    <string name="remove_from_list">✓ My List</string>
+    <string name="overview">Overview</string>
+    <string name="cast">Cast</string>
+    <string name="runtime">Runtime</string>
+    <string name="release_date">Release Date</string>
+    <string name="rating">Rating</string>
+    <string name="minutes">min</string>
+
+    <!-- Search -->
+    <string name="search_results">Search Results</string>
+    <string name="no_results_found">No results found</string>
+    <string name="search_movies">Search Movies</string>
+
+    <!-- Errors -->
+    <string name="error_loading_movies">Error loading movies</string>
+    <string name="error_network">Network error. Check your connection.</string>
+    <string name="retry">Retry</string>
+
+    <!-- Loading -->
+    <string name="loading">Loading...</string>
+
+    <!-- Empty States -->
+    <string name="no_movies_found">No movies found</string>
+    <string name="empty_favorites">Your list is empty</string>
+    <string name="empty_favorites_subtitle">Movies you add will appear here</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_movie_poster">Movie poster</string>
+    <string name="cd_search_icon">Search</string>
+    <string name="cd_favorite_icon">Add to favorites</string>
+    <string name="cd_play_button">Play movie</string>
+    <string name="cd_back_button">Go back</string>
 </resources>
