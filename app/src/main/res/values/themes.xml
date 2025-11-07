@@ -18,7 +18,6 @@
         <item name="android:statusBarColor">@color/status_bar_color</item>
         <item name="android:navigationBarColor">@color/netflix_black</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
 
         <!-- Text Appearances -->
         <item name="textAppearanceHeadline1">@style/NetflixTextAppearance.Headline1</item>

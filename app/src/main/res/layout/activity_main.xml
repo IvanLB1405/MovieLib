@@ -44,6 +44,16 @@
                         android:fontFamily="sans-serif-medium" />
 
                     <ImageView
+                        android:id="@+id/libraryIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_library"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        app:tint="#FFFFFF" />
+
+                    <ImageView
                         android:id="@+id/searchIcon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -126,12 +136,12 @@
                         android:orientation="horizontal">
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/playButton"
+                            android:id="@+id/rateButton"
                             android:layout_width="0dp"
                             android:layout_height="48dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            android:text="▶ Play"
+                            android:text="★ Puntuar"
                             android:textColor="#000000"
                             android:textStyle="bold"
                             app:backgroundTint="#FFFFFF"

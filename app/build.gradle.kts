@@ -34,6 +34,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -53,4 +56,15 @@ dependencies {
 
     //LifeCycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    //Glide for image loading
+    implementation(libs.glide)
+    kapt(libs.glide.compiler)
+
+    //RecyclerView and ConstraintLayout
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.cardview)
 }

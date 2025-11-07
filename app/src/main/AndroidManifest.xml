@@ -18,15 +18,39 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <!-- Activity principal para pruebas de API -->
+        <!-- Main Activity - Pantalla principal -->
         <activity
-            android:name="com.movielib.app.ApiTestActivity"
-            android:exported="true">
+            android:name="com.movielib.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MovieLib">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Search Activity - Búsqueda de películas -->
+        <activity
+            android:name="com.movielib.SearchActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MovieLib" />
+
+        <!-- Movie Detail Activity - Detalles de película -->
+        <activity
+            android:name="com.movielib.MovieDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MovieLib" />
+
+        <!-- Library Activity - Biblioteca personal -->
+        <activity
+            android:name="com.movielib.LibraryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MovieLib" />
+
+        <!-- API Test Activity - Para pruebas de desarrollo -->
+        <activity
+            android:name="com.movielib.app.ApiTestActivity"
+            android:exported="false" />
 
     </application>
 </manifest>

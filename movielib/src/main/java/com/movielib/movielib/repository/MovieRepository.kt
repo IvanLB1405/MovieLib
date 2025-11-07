@@ -86,6 +86,31 @@ class MovieRepository(
         }
     }
 
+    fun getTopRatedMovies(page: Int = 1): Flow<ApiResponse<List<Movie>>> = flow {
+        emit(ApiResponse.Loading)
+
+        try {
+            val response = tmdbService.getTopRatedMovies(apiKey, page)
+
+            if (response.isSuccessful) {
+                val movieSearchResponse = response.body()
+                if (movieSearchResponse != null) {
+                    val movies = movieSearchResponse.results.map { it.toMovie() }
+                    movieDao.insertMovies(movies)
+                    emit(ApiResponse.Success(movies))
+                } else {
+                    emit(ApiResponse.Error("Respuesta vacía del servidor"))
+                }
+            } else {
+                emit(ApiResponse.Error("Error del servidor: ${response.code()}", response.code()))
+            }
+        } catch (e: IOException) {
+            emit(ApiResponse.NetworkError)
+        } catch (e: Exception) {
+            emit(ApiResponse.Error("Error: ${e.message}"))
+        }
+    }
+
     fun getMovieDetails(movieId: Int): Flow<ApiResponse<Movie>> = flow {
         emit(ApiResponse.Loading)
 
