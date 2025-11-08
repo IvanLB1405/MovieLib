@@ -180,6 +180,10 @@ class MovieRepository(
         return movieDao.getLibraryMovies()
     }
 
+    suspend fun getMoviesWithReviews(): List<Movie> {
+        return movieDao.getMoviesWithReviews()
+    }
+
     suspend fun addToLibrary(movieId: Int): Boolean {
         return try {
             movieDao.addToLibrary(movieId)

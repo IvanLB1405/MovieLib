@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MovieLib</string>
+    <string name="app_name">MovieCritique</string>
 
     <!-- Main Activity -->
     <string name="popular_movies">Popular</string>

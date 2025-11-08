@@ -124,6 +124,16 @@ class MovieDetailActivity : AppCompatActivity() {
         // Set overview
         binding.overviewTextView.text = movie.overview ?: "No overview available."
 
+        // Set cast
+        movie.cast?.let { cast ->
+            if (cast.isNotEmpty()) {
+                binding.castSection.visibility = View.VISIBLE
+                binding.castTextView.text = cast.replace(",", " • ")
+            }
+        } ?: run {
+            binding.castSection.visibility = View.GONE
+        }
+
         // Load backdrop image
         val backdropUrl = Constants.buildPosterUrl(
             movie.posterPath,

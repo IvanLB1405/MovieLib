@@ -82,7 +82,7 @@
             android:layout_margin="8dp"
             android:src="@drawable/ic_favorite_filled"
             android:visibility="gone"
-            app:tint="#E50914" />
+            app:tint="@color/critique_orange" />
 
     </RelativeLayout>
 

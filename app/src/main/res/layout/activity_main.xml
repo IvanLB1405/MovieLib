@@ -12,6 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#000000"
+        android:paddingTop="8dp"
+        android:fitsSystemWindows="true"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -37,8 +39,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="MovieLib"
-                        android:textColor="#E50914"
+                        android:text="MovieCritique"
+                        android:textColor="@color/critique_orange"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-medium" />
@@ -267,7 +269,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:indeterminateTint="#E50914"
+        android:indeterminateTint="@color/critique_orange"
         android:visibility="visible" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

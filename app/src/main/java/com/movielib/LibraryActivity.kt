@@ -6,7 +6,9 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.movielib.adapters.MovieAdapter
+import com.movielib.adapters.MovieReviewAdapter
 import com.movielib.movielib.database.MovieDatabase
 import com.movielib.movielib.databinding.ActivityLibraryBinding
 import com.movielib.movielib.repository.MovieRepository
@@ -19,6 +21,7 @@ class LibraryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLibraryBinding
     private lateinit var repository: MovieRepository
     private lateinit var adapter: MovieAdapter
+    private lateinit var reviewsAdapter: MovieReviewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,7 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
+        // Setup main library grid
         adapter = MovieAdapter(MovieAdapter.LayoutType.GRID) { movie ->
             navigateToMovieDetail(movie.id)
         }
@@ -56,6 +60,16 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryRecyclerView.apply {
             layoutManager = GridLayoutManager(this@LibraryActivity, 3)
             adapter = this@LibraryActivity.adapter
+        }
+
+        // Setup reviews list
+        reviewsAdapter = MovieReviewAdapter { movie ->
+            navigateToMovieDetail(movie.id)
+        }
+
+        binding.reviewsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(this@LibraryActivity)
+            adapter = this@LibraryActivity.reviewsAdapter
         }
     }
 
@@ -67,6 +81,9 @@ class LibraryActivity : AppCompatActivity() {
             val stats = repository.getLibraryStats()
             displayStats(stats)
 
+            // Load movies with reviews
+            loadReviews()
+
             // Load library movies
             repository.getLibraryMoviesFlow().collectLatest { movies ->
                 hideLoading()
@@ -76,6 +93,20 @@ class LibraryActivity : AppCompatActivity() {
                 } else {
                     showMovies(movies)
                 }
+            }
+        }
+    }
+
+    private fun loadReviews() {
+        lifecycleScope.launch {
+            val reviewedMovies = repository.getMoviesWithReviews()
+
+            if (reviewedMovies.isNotEmpty()) {
+                binding.reviewsSection.visibility = View.VISIBLE
+                binding.reviewsCountText.text = reviewedMovies.size.toString()
+                reviewsAdapter.submitList(reviewedMovies)
+            } else {
+                binding.reviewsSection.visibility = View.GONE
             }
         }
     }
