@@ -23,6 +23,10 @@ class LibraryActivity : AppCompatActivity() {
     private lateinit var adapter: MovieAdapter
     private lateinit var reviewsAdapter: MovieReviewAdapter
 
+    companion object {
+        private const val GRID_COLUMN_COUNT = 3
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLibraryBinding.inflate(layoutInflater)
@@ -58,7 +62,7 @@ class LibraryActivity : AppCompatActivity() {
         }
 
         binding.libraryRecyclerView.apply {
-            layoutManager = GridLayoutManager(this@LibraryActivity, 3)
+            layoutManager = GridLayoutManager(this@LibraryActivity, GRID_COLUMN_COUNT)
             adapter = this@LibraryActivity.adapter
         }
 

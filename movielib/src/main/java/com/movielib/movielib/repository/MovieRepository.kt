@@ -27,6 +27,15 @@ class MovieRepository(
 
     private val tmdbService: TMDbService = ApiClient.getTMDbService()
 
+    companion object {
+        private const val ERROR_EMPTY_RESPONSE = "Empty response from server"
+        private const val ERROR_SERVER = "Server error: %d"
+        private const val ERROR_HTTP = "HTTP error: %s"
+        private const val ERROR_UNEXPECTED = "Unexpected error: %s"
+        private const val ERROR_GENERIC = "Error: %s"
+        private const val ERROR_MOVIE_NOT_FOUND = "Movie not found"
+    }
+
     fun searchMovies(query: String, page: Int = 1): Flow<ApiResponse<List<Movie>>> = flow {
         emit(ApiResponse.Loading)
 
@@ -47,17 +56,17 @@ class MovieRepository(
 
                     emit(ApiResponse.Success(movies))
                 } else {
-                    emit(ApiResponse.Error("Respuesta vacía del servidor"))
+                    emit(ApiResponse.Error(ERROR_EMPTY_RESPONSE))
                 }
             } else {
-                emit(ApiResponse.Error("Error del servidor: ${response.code()}", response.code()))
+                emit(ApiResponse.Error(ERROR_SERVER.format(response.code()), response.code()))
             }
         } catch (e: IOException) {
             emit(ApiResponse.NetworkError)
         } catch (e: HttpException) {
-            emit(ApiResponse.Error("Error HTTP: ${e.message()}", e.code()))
+            emit(ApiResponse.Error(ERROR_HTTP.format(e.message()), e.code()))
         } catch (e: Exception) {
-            emit(ApiResponse.Error("Error inesperado: ${e.message}"))
+            emit(ApiResponse.Error(ERROR_UNEXPECTED.format(e.message)))
         }
     }
 
@@ -74,15 +83,15 @@ class MovieRepository(
                     movieDao.insertMovies(movies)
                     emit(ApiResponse.Success(movies))
                 } else {
-                    emit(ApiResponse.Error("Respuesta vacía del servidor"))
+                    emit(ApiResponse.Error(ERROR_EMPTY_RESPONSE))
                 }
             } else {
-                emit(ApiResponse.Error("Error del servidor: ${response.code()}", response.code()))
+                emit(ApiResponse.Error(ERROR_SERVER.format(response.code()), response.code()))
             }
         } catch (e: IOException) {
             emit(ApiResponse.NetworkError)
         } catch (e: Exception) {
-            emit(ApiResponse.Error("Error: ${e.message}"))
+            emit(ApiResponse.Error(ERROR_GENERIC.format(e.message)))
         }
     }
 
@@ -99,15 +108,15 @@ class MovieRepository(
                     movieDao.insertMovies(movies)
                     emit(ApiResponse.Success(movies))
                 } else {
-                    emit(ApiResponse.Error("Respuesta vacía del servidor"))
+                    emit(ApiResponse.Error(ERROR_EMPTY_RESPONSE))
                 }
             } else {
-                emit(ApiResponse.Error("Error del servidor: ${response.code()}", response.code()))
+                emit(ApiResponse.Error(ERROR_SERVER.format(response.code()), response.code()))
             }
         } catch (e: IOException) {
             emit(ApiResponse.NetworkError)
         } catch (e: Exception) {
-            emit(ApiResponse.Error("Error: ${e.message}"))
+            emit(ApiResponse.Error(ERROR_GENERIC.format(e.message)))
         }
     }
 
@@ -149,14 +158,14 @@ class MovieRepository(
                     if (localMovie != null) {
                         emit(ApiResponse.Success(localMovie))
                     } else {
-                        emit(ApiResponse.Error("Película no encontrada"))
+                        emit(ApiResponse.Error(ERROR_MOVIE_NOT_FOUND))
                     }
                 }
             } else {
                 if (localMovie != null) {
                     emit(ApiResponse.Success(localMovie))
                 } else {
-                    emit(ApiResponse.Error("Error del servidor: ${response.code()}", response.code()))
+                    emit(ApiResponse.Error(ERROR_SERVER.format(response.code()), response.code()))
                 }
             }
         } catch (e: IOException) {
@@ -168,7 +177,7 @@ class MovieRepository(
                 emit(ApiResponse.NetworkError)
             }
         } catch (e: Exception) {
-            emit(ApiResponse.Error("Error: ${e.message}"))
+            emit(ApiResponse.Error(ERROR_GENERIC.format(e.message)))
         }
     }
 

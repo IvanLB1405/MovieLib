@@ -27,6 +27,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var adapter: MovieAdapter
     private var searchJob: Job? = null
 
+    companion object {
+        const val EXTRA_MOVIE_ID = "extra_movie_id"
+        private const val GRID_COLUMN_COUNT = 3
+        private const val SEARCH_DEBOUNCE_DELAY = 500L
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
@@ -49,7 +55,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.searchResultsRecyclerView.apply {
-            layoutManager = GridLayoutManager(this@SearchActivity, 3)
+            layoutManager = GridLayoutManager(this@SearchActivity, GRID_COLUMN_COUNT)
             adapter = this@SearchActivity.adapter
         }
     }
@@ -67,9 +73,9 @@ class SearchActivity : AppCompatActivity() {
                 if (query.isEmpty()) {
                     showEmptyState()
                 } else {
-                    // Debounce search - wait 500ms before searching
+                    // Debounce search
                     searchJob = lifecycleScope.launch {
-                        delay(500)
+                        delay(SEARCH_DEBOUNCE_DELAY)
                         searchMovies(query)
                     }
                 }
@@ -134,7 +140,7 @@ class SearchActivity : AppCompatActivity() {
         binding.searchResultsRecyclerView.visibility = View.GONE
         binding.searchProgressBar.visibility = View.GONE
 
-        binding.noResultsDescription.text = "No results found for \"$query\""
+        binding.noResultsDescription.text = getString(R.string.no_results_for_query, query)
     }
 
     private fun showResultsState(movies: List<Movie>) {
@@ -151,9 +157,5 @@ class SearchActivity : AppCompatActivity() {
             putExtra(EXTRA_MOVIE_ID, movie.id)
         }
         startActivity(intent)
-    }
-
-    companion object {
-        const val EXTRA_MOVIE_ID = "extra_movie_id"
     }
 }

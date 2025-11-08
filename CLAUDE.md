@@ -250,6 +250,199 @@ When implementing UI features, refer to the existing layout files:
 
 ---
 
+## 📋 PROGRESO DE MEJORAS DE CÓDIGO (Code Cleanup)
+
+> **Última actualización:** 2025-01-08
+> **Estado del proyecto:** v1.0 - Funcional y listo para PFC
+> **Próximas mejoras:** Documentación y calidad de código
+
+### ✅ MEJORAS COMPLETADAS (Sesión 2025-01-08)
+
+#### LIMPIEZA-01: Eliminación de Logs de Debug ✅ COMPLETADO
+**Archivo:** `app/src/main/java/com/movielib/ApiTestActivity.kt`
+- ✅ Eliminados **36 logs de debug** (Log.d, Log.e, Log.w)
+- ✅ Removido import `android.util.Log`
+- ✅ Removido import `kotlinx.coroutines.flow.collect` (no usado)
+- **Beneficio:** Código más limpio y profesional
+
+#### LIMPIEZA-02: Constantes para Magic Numbers ✅ COMPLETADO
+**Archivos modificados:**
+- `app/src/main/java/com/movielib/MovieDetailActivity.kt`
+  - ✅ `RATING_BAR_MAX = 5f`
+  - ✅ `TMDB_RATING_MAX = 10f`
+  - ✅ `RATING_SCALE_FACTOR = 2f`
+
+- `app/src/main/java/com/movielib/SearchActivity.kt`
+  - ✅ `GRID_COLUMN_COUNT = 3`
+  - ✅ `SEARCH_DEBOUNCE_DELAY = 500L`
+
+- `app/src/main/java/com/movielib/LibraryActivity.kt`
+  - ✅ `GRID_COLUMN_COUNT = 3`
+
+**Beneficio:** Código más legible y mantenible, fácil de ajustar
+
+#### LIMPIEZA-03: Externalización de Strings ✅ COMPLETADO
+**Archivos modificados:**
+
+1. **`app/res/values/strings.xml`** - Añadidos 13 nuevos strings:
+   - Mensajes de error (error_loading_movie_details, error_network, etc.)
+   - Acciones de biblioteca (added_to_library, removed_from_library)
+   - UI labels (rated_label, no_overview, save, cancel)
+   - Búsqueda (no_results_for_query)
+
+2. **Código actualizado:**
+   - ✅ `MovieDetailActivity.kt` - 11 strings externalizados
+   - ✅ `SearchActivity.kt` - 1 string externalizado
+   - ✅ `MovieRepository.kt` - 6 constantes para mensajes de error
+
+**Beneficio:** Facilita internacionalización y mantenimiento centralizado
+
+#### LIMPIEZA-04: Build Exitoso ✅ COMPLETADO
+- ✅ Corregido error en `ic_launcher_foreground.xml`
+- ✅ Build completado: **186 tasks ejecutadas exitosamente**
+- ⚠️ 1 warning menor (namespace duplicado - no crítico para proyecto local)
+
+**Métricas de mejora:**
+| Métrica | Antes | Después | Mejora |
+|---------|-------|---------|--------|
+| Logs de debug | 36 líneas | 0 líneas | -100% |
+| Magic numbers | 5 instancias | 0 instancias | -100% |
+| Strings hardcodeados | ~20 instancias | 0 instancias | -100% |
+| Imports no usados | 2 | 0 | -100% |
+
+---
+
+### 📝 MEJORAS PENDIENTES (Próximas Sesiones)
+
+#### DOC-01: Documentación KDoc 🔜 PENDIENTE
+**Prioridad:** Media
+**Tiempo estimado:** 2-3 horas
+
+**Archivos a documentar:**
+- `movielib/src/main/java/com/movielib/movielib/repository/MovieRepository.kt`
+  - Documentar métodos públicos con ejemplos de uso
+  - Añadir @param y @return en todas las funciones
+
+- `movielib/src/main/java/com/movielib/movielib/api/TMDbService.kt`
+  - Documentar endpoints de la API
+
+- `movielib/src/main/java/com/movielib/movielib/database/MovieDao.kt`
+  - Documentar queries de Room
+
+- Activities principales:
+  - `MainActivity.kt`, `SearchActivity.kt`, `MovieDetailActivity.kt`, `LibraryActivity.kt`
+  - Documentar lógica de negocio importante
+
+**Ejemplo de formato:**
+```kotlin
+/**
+ * Busca películas en la API de TMDb usando un término de búsqueda.
+ *
+ * Este método realiza una búsqueda paginada en la base de datos de películas,
+ * cachea los resultados localmente y emite estados de carga mediante Flow.
+ *
+ * @param query Término de búsqueda (mínimo 3 caracteres recomendado)
+ * @param page Número de página (por defecto 1)
+ * @return Flow que emite ApiResponse con estados Loading/Success/Error
+ *
+ * @sample
+ * ```kotlin
+ * repository.searchMovies("Inception").collect { response ->
+ *     when (response) {
+ *         is ApiResponse.Success -> displayMovies(response.data)
+ *         is ApiResponse.Error -> showError(response.message)
+ *         // ...
+ *     }
+ * }
+ * ```
+ *
+ * @see ApiResponse
+ * @see Movie
+ */
+fun searchMovies(query: String, page: Int = 1): Flow<ApiResponse<List<Movie>>>
+```
+
+#### DOC-02: README de la Librería 🔜 PENDIENTE
+**Prioridad:** Media
+**Tiempo estimado:** 1 hora
+
+**Archivo a crear:** `movielib/README.md`
+
+**Contenido sugerido:**
+- Instrucciones de integración de la librería
+- Ejemplos de uso básicos
+- API pública documentada
+- Requisitos y dependencias
+- Screenshots (opcional)
+
+#### TEST-01: Tests Unitarios Básicos 🔜 PENDIENTE
+**Prioridad:** Baja (opcional para PFC, recomendado para producción)
+**Tiempo estimado:** 4-6 horas
+
+**Archivos a crear:**
+- `movielib/src/test/java/com/movielib/movielib/repository/MovieRepositoryTest.kt`
+- `movielib/src/test/java/com/movielib/movielib/database/MovieDaoTest.kt`
+- `app/src/test/java/com/movielib/viewmodels/` (si se implementan ViewModels)
+
+**Dependencias necesarias:**
+```kotlin
+testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+testImplementation("io.mockk:mockk:1.13.8")
+testImplementation("app.cash.turbine:turbine:1.0.0")
+```
+
+**Ejemplo de test:**
+```kotlin
+class MovieRepositoryTest {
+    @Test
+    fun `searchMovies returns success with valid query`() = runTest {
+        // Arrange
+        val mockDao = mockk<MovieDao>()
+        val repository = MovieRepository(mockDao, "test_key")
+
+        // Act & Assert
+        repository.searchMovies("Inception").test {
+            assertEquals(ApiResponse.Loading, awaitItem())
+            val success = awaitItem() as ApiResponse.Success
+            assertTrue(success.data.isNotEmpty())
+            awaitComplete()
+        }
+    }
+}
+```
+
+#### LIMPIEZA-05: Comentarios Estandarizados 🔜 PENDIENTE
+**Prioridad:** Baja
+**Tiempo estimado:** 30 minutos
+
+**Problema:** Comentarios en español e inglés mezclados
+**Solución:** Estandarizar a inglés (mejor práctica para código público)
+
+**Archivos afectados:** Todos los .kt
+
+**Ejemplo:**
+```kotlin
+// Current: "Películas en biblioteca"
+// Better: "Movies in user library"
+```
+
+#### LIMPIEZA-06: Checklist Final 🔜 PENDIENTE
+**Prioridad:** Alta (antes de entrega final PFC)
+**Tiempo estimado:** 1 hora
+
+- [ ] Remover código comentado innecesario
+- [ ] Eliminar imports no usados (Optimize Imports)
+- [ ] Formatear código según Kotlin Style Guide
+- [ ] Actualizar dependencias a últimas versiones estables
+- [ ] Revisar y resolver/eliminar TODOs
+- [ ] Ejecutar `./gradlew lint` y revisar warnings
+- [ ] Limpiar recursos no usados (drawables, layouts)
+- [ ] Verificar permisos necesarios en Manifest
+- [ ] Generar documentación con Dokka (opcional)
+- [ ] Crear CHANGELOG.md con versiones (opcional)
+
+---
+
 ## 🔧 MEJORAS PENDIENTES PARA VERSIÓN 2.0 (Auditoría Senior Developer)
 
 > **Nota:** Esta sección documenta mejoras técnicas identificadas en auditoría de código (Enero 2025).

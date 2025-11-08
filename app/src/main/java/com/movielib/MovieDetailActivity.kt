@@ -25,6 +25,12 @@ class MovieDetailActivity : AppCompatActivity() {
     private lateinit var repository: MovieRepository
     private var currentMovie: Movie? = null
 
+    companion object {
+        private const val RATING_BAR_MAX = 5f
+        private const val TMDB_RATING_MAX = 10f
+        private const val RATING_SCALE_FACTOR = TMDB_RATING_MAX / RATING_BAR_MAX
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMovieDetailBinding.inflate(layoutInflater)
@@ -89,11 +95,11 @@ class MovieDetailActivity : AppCompatActivity() {
                     }
                     is ApiResponse.Error -> {
                         hideLoading()
-                        showError("Error loading movie details: ${response.message}")
+                        showError(getString(R.string.error_loading_movie_details, response.message))
                     }
                     is ApiResponse.NetworkError -> {
                         hideLoading()
-                        showError("Network error. Please check your connection.")
+                        showError(getString(R.string.error_network))
                     }
                 }
             }
@@ -122,7 +128,7 @@ class MovieDetailActivity : AppCompatActivity() {
         }
 
         // Set overview
-        binding.overviewTextView.text = movie.overview ?: "No overview available."
+        binding.overviewTextView.text = movie.overview ?: getString(R.string.no_overview)
 
         // Set cast
         movie.cast?.let { cast ->
@@ -163,7 +169,7 @@ class MovieDetailActivity : AppCompatActivity() {
 
         // Show user rating if exists
         movie.userRating?.let { rating ->
-            binding.rateButton.text = "★ Puntuado: ${String.format("%.1f", rating)}/10"
+            binding.rateButton.text = getString(R.string.rated_label, rating)
         }
     }
 
@@ -178,24 +184,24 @@ class MovieDetailActivity : AppCompatActivity() {
                     userReview = null
                 )
                 updateFavoriteUI(false)
-                showSnackbar("Removed from your library")
+                showSnackbar(getString(R.string.removed_from_library))
             } else {
                 // Add to library
                 repository.addToLibrary(movie.id)
                 currentMovie = movie.copy(isInLibrary = true)
                 updateFavoriteUI(true)
-                showSnackbar("Added to your library")
+                showSnackbar(getString(R.string.added_to_library))
             }
         }
     }
 
     private fun updateFavoriteUI(isInLibrary: Boolean) {
         if (isInLibrary) {
-            binding.favoriteButton.text = "✓ In My List"
+            binding.favoriteButton.text = getString(R.string.remove_from_list)
             binding.favoriteButton.strokeWidth = 0
             binding.favoriteIcon.setImageResource(R.drawable.ic_favorite_filled)
         } else {
-            binding.favoriteButton.text = "+ My List"
+            binding.favoriteButton.text = getString(R.string.add_to_list)
             binding.favoriteButton.strokeWidth = 2
             binding.favoriteIcon.setImageResource(R.drawable.ic_favorite_border)
         }
@@ -208,20 +214,20 @@ class MovieDetailActivity : AppCompatActivity() {
 
         // Set existing rating and review if available
         movie.userRating?.let { rating ->
-            ratingBar.rating = rating / 2f // RatingBar is 0-5, userRating is 0-10
+            ratingBar.rating = rating / RATING_SCALE_FACTOR
         }
         reviewEditText.setText(movie.userReview ?: "")
 
         AlertDialog.Builder(this)
-            .setTitle("Rate & Review")
+            .setTitle(getString(R.string.rate_review_title))
             .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
-                val rating = ratingBar.rating * 2f // Convert back to 0-10 scale
+            .setPositiveButton(getString(R.string.save)) { _, _ ->
+                val rating = ratingBar.rating * RATING_SCALE_FACTOR
                 val review = reviewEditText.text.toString().trim()
 
                 saveRatingAndReview(movie, rating, review)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
@@ -251,9 +257,9 @@ class MovieDetailActivity : AppCompatActivity() {
 
             // Update UI
             updateFavoriteUI(true)
-            binding.rateButton.text = "★ Puntuado: ${String.format("%.1f", rating)}/10"
+            binding.rateButton.text = getString(R.string.rated_label, rating)
 
-            showSnackbar("Puntuación y reseña guardadas")
+            showSnackbar(getString(R.string.rating_review_saved))
         }
     }
 

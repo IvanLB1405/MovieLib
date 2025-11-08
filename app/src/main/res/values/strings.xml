@@ -13,22 +13,38 @@
     <!-- Movie Detail -->
     <string name="play">Play</string>
     <string name="add_to_list">+ My List</string>
-    <string name="remove_from_list">✓ My List</string>
+    <string name="remove_from_list">✓ In My List</string>
+    <string name="added_to_library">Added to your library</string>
+    <string name="removed_from_library">Removed from your library</string>
     <string name="overview">Overview</string>
+    <string name="no_overview">No overview available.</string>
     <string name="cast">Cast</string>
     <string name="runtime">Runtime</string>
     <string name="release_date">Release Date</string>
     <string name="rating">Rating</string>
+    <string name="rated_label">★ Puntuado: %.1f/10</string>
     <string name="minutes">min</string>
+    <string name="rate_review_title">Rate &amp; Review</string>
+    <string name="rating_review_saved">Puntuación y reseña guardadas</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
 
     <!-- Search -->
     <string name="search_results">Search Results</string>
     <string name="no_results_found">No results found</string>
+    <string name="no_results_for_query">No results found for \"%s\"</string>
     <string name="search_movies">Search Movies</string>
 
     <!-- Errors -->
     <string name="error_loading_movies">Error loading movies</string>
-    <string name="error_network">Network error. Check your connection.</string>
+    <string name="error_loading_movie_details">Error loading movie details: %s</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_server">Server error: %d</string>
+    <string name="error_http">HTTP error: %s</string>
+    <string name="error_unexpected">Unexpected error: %s</string>
+    <string name="error_generic">Error: %s</string>
+    <string name="error_empty_response">Empty response from server</string>
+    <string name="error_movie_not_found">Movie not found</string>
     <string name="retry">Retry</string>
 
     <!-- Loading -->

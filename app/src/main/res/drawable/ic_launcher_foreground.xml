@@ -5,26 +5,14 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Bookmark/Banner with Play Triangle Cutout - Balanced size -->
-    <group android:translateX="54" android:translateY="54">
-
-        <!-- Main bookmark/banner shape (orange pastel) - balanced and centered -->
-        <path
-            android:fillColor="#F4A261"
-            android:fillType="evenOdd"
-            android:pathData="
-            M-13,-20
-            L13,-20
-            L13,16
-            L0,24
-            L-13,16
-            Z
-
-            M-5,0
-            L5,4
-            L-5,8
-            Z" />
-
-    </group>
-
+    <!--
+        Este es el 'foreground' (primer plano) del icono adaptativo.
+        El diseño es un ticket/marcador (MovieLib) con un símbolo de 'Play'
+        recortado (MovieCritique)
+        La geometría está optimizada para el viewport 108x108.
+    -->
+    <path
+        android:fillColor="#F4A261"
+        android:pathData="M32 28 H76 V80 L54 69 L32 80 Z M49 49 L64 54 L49 60 Z"
+        android:fillType="evenOdd" />
 </vector>
