@@ -1,20 +1,24 @@
 package com.movielib.movielib.utils
 
+import com.movielib.movielib.BuildConfig
+
 /**
  * Constantes globales de la librería MovieLib
  */
 object Constants {
 
     /**
-     * API Key de TMDb - IMPORTANTE: Reemplazar con tu clave real
+     * API Key de TMDb - Leída de forma segura desde BuildConfig
      *
-     * Para obtener tu API Key:
+     * Para configurar tu API Key:
      * 1. Regístrate en https://www.themoviedb.org/
      * 2. Ve a Settings > API
      * 3. Solicita una API Key de desarrollador
-     * 4. Reemplaza "TU_API_KEY_AQUI" con tu clave real
+     * 4. Añádela en local.properties: TMDB_API_KEY=tu_clave_aqui
+     *
+     * NOTA: local.properties está en .gitignore y NO se commitea al repositorio
      */
-    const val TMDB_API_KEY = "6f2a6c97b1847399b8d44e7e0009a1d4"
+    val TMDB_API_KEY: String = BuildConfig.TMDB_API_KEY
 
     // URLs de la API
     const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
@@ -42,7 +46,7 @@ object Constants {
 
     // Validación de API Key
     fun isApiKeyValid(): Boolean {
-        return TMDB_API_KEY != "6f2a6c97b1847399b8d44e7e0009a1d4" && TMDB_API_KEY.isNotBlank()
+        return TMDB_API_KEY.isNotBlank()
     }
 
     /**

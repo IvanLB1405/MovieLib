@@ -1,5 +1,6 @@
 package com.movielib.movielib.api
 
+import com.movielib.movielib.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -9,7 +10,16 @@ import java.util.concurrent.TimeUnit
 /**
  * Cliente Retrofit para manejar las peticiones HTTP a la API de TMDb
  *
- * Implementa patrón Singleton para reutilizar la instancia
+ * Implementa patrón Singleton para reutilizar la instancia de Retrofit y optimizar recursos.
+ * Configura automáticamente timeouts, logging (solo en debug) y conversión JSON con Gson.
+ *
+ * Características:
+ * - Logging HTTP solo en modo DEBUG para seguridad
+ * - Timeout configurable de 30 segundos
+ * - Conversión automática JSON con Gson
+ * - Reutilización de conexiones HTTP
+ *
+ * @see TMDbService
  */
 object ApiClient {
 
@@ -17,24 +27,32 @@ object ApiClient {
 
     /**
      * Configuración de OkHttpClient con interceptores
+     *
+     * NOTA: El logging interceptor solo se activa en modo DEBUG para evitar
+     * exposición de datos sensibles en producción y mejorar el rendimiento
      */
     private fun getOkHttpClient(): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
-        return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .build()
+        return OkHttpClient.Builder().apply {
+            // Solo añadir logging en modo debug
+            if (BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                }
+                addInterceptor(loggingInterceptor)
+            }
+            connectTimeout(30, TimeUnit.SECONDS)
+            readTimeout(30, TimeUnit.SECONDS)
+            writeTimeout(30, TimeUnit.SECONDS)
+        }.build()
     }
 
     /**
      * Obtiene la instancia de Retrofit (Singleton)
      *
-     * @return Instancia configurada de Retrofit
+     * Crea la instancia de Retrofit solo en la primera llamada. Las llamadas
+     * posteriores reutilizan la misma instancia para optimizar recursos.
+     *
+     * @return Instancia configurada de Retrofit con OkHttpClient y Gson
      */
     private fun getRetrofit(): Retrofit {
         if (retrofit == null) {
@@ -50,14 +68,21 @@ object ApiClient {
     /**
      * Obtiene la instancia del servicio TMDb
      *
-     * @return Instancia de TMDbService
+     * Método público principal para obtener acceso a la interfaz TMDbService.
+     * Todas las llamadas a la API deben hacerse a través de esta instancia.
+     *
+     * @return Instancia de TMDbService configurada y lista para usar
+     * @see TMDbService
      */
     fun getTMDbService(): TMDbService {
         return getRetrofit().create(TMDbService::class.java)
     }
 
     /**
-     * Método para limpiar la instancia (útil para testing)
+     * Limpia la instancia de Retrofit para forzar recreación
+     *
+     * Útil principalmente para testing cuando se necesita reiniciar el estado
+     * del cliente HTTP. NO debería usarse en código de producción.
      */
     fun clearInstance() {
         retrofit = null

@@ -10,8 +10,15 @@ import retrofit2.http.Query
 /**
  * Interfaz de Retrofit para la API de TMDb (The Movie Database)
  *
- * Documentación de la API: https://developers.themoviedb.org/3
+ * Proporciona acceso a los endpoints principales de TMDb para buscar películas,
+ * obtener detalles, listas populares y mejor valoradas. Todas las funciones son
+ * suspendibles para uso con Kotlin Coroutines.
+ *
+ * Documentación oficial de la API: https://developers.themoviedb.org/3
  * Base URL: https://api.themoviedb.org/3/
+ *
+ * @see ApiClient
+ * @see MovieRepository
  */
 interface TMDbService {
 
