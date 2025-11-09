@@ -3,26 +3,35 @@ package com.movielib
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.movielib.adapters.MovieAdapter
+import com.movielib.base.BaseMovieActivity
+import com.movielib.extensions.handle
 import com.movielib.movielib.R
-import com.movielib.movielib.api.ApiResponse
-import com.movielib.movielib.database.MovieDatabase
 import com.movielib.movielib.databinding.ActivityMainBinding
 import com.movielib.movielib.models.Movie
-import com.movielib.movielib.repository.MovieRepository
 import com.movielib.movielib.utils.Constants
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+/**
+ * Main screen activity displaying popular movies, top rated, and user's library
+ *
+ * Features:
+ * - Hero section with featured movie
+ * - Horizontal lists of popular and top-rated movies
+ * - User's personal library section (visible only if not empty)
+ * - Navigation to search and library screens
+ *
+ * @see BaseMovieActivity
+ */
+class MainActivity : BaseMovieActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var repository: MovieRepository
 
     private lateinit var popularAdapter: MovieAdapter
     private lateinit var topRatedAdapter: MovieAdapter
@@ -33,54 +42,45 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupRepository()
         setupRecyclerViews()
-        setupSearchButton()
+        setupClickListeners()
         setupHeroSection()
         loadData()
     }
 
     override fun onResume() {
         super.onResume()
-        // Reload favorites when returning to MainActivity
         loadFavorites()
     }
 
-    private fun setupRepository() {
-        val database = MovieDatabase.getDatabase(this)
-        repository = MovieRepository(database.movieDao(), Constants.TMDB_API_KEY)
-    }
-
     private fun setupRecyclerViews() {
-        // Popular movies
-        popularAdapter = MovieAdapter(MovieAdapter.LayoutType.HORIZONTAL) { movie ->
-            navigateToMovieDetail(movie)
-        }
-        binding.popularMoviesRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
-            adapter = popularAdapter
-        }
+        popularAdapter = createHorizontalAdapter()
+        topRatedAdapter = createHorizontalAdapter()
+        favoritesAdapter = createHorizontalAdapter()
 
-        // Top rated movies
-        topRatedAdapter = MovieAdapter(MovieAdapter.LayoutType.HORIZONTAL) { movie ->
-            navigateToMovieDetail(movie)
-        }
-        binding.topRatedMoviesRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
-            adapter = topRatedAdapter
-        }
+        setupRecyclerView(binding.popularMoviesRecyclerView, popularAdapter)
+        setupRecyclerView(binding.topRatedMoviesRecyclerView, topRatedAdapter)
+        setupRecyclerView(binding.favoritesRecyclerView, favoritesAdapter)
+    }
 
-        // Favorites movies
-        favoritesAdapter = MovieAdapter(MovieAdapter.LayoutType.HORIZONTAL) { movie ->
-            navigateToMovieDetail(movie)
-        }
-        binding.favoritesRecyclerView.apply {
+    /**
+     * Helper function to create horizontal movie adapters (DRY principle)
+     */
+    private fun createHorizontalAdapter() = MovieAdapter(MovieAdapter.LayoutType.HORIZONTAL) { movie ->
+        navigateToMovieDetail(movie)
+    }
+
+    /**
+     * Helper function to setup horizontal RecyclerViews (DRY principle)
+     */
+    private fun setupRecyclerView(recyclerView: RecyclerView, adapter: MovieAdapter) {
+        recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
-            adapter = favoritesAdapter
+            this.adapter = adapter
         }
     }
 
-    private fun setupSearchButton() {
+    private fun setupClickListeners() {
         binding.searchIcon.setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
@@ -91,23 +91,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupHeroSection() {
+        // Lambda to get movie ID from hero section
+        val getHeroMovieId = { binding.heroSection.tag as? Int }
+
         binding.rateButton.setOnClickListener {
-            // Navigate to the featured movie detail to rate
-            val movieId = binding.heroSection.tag as? Int
-            movieId?.let { id ->
-                val intent = Intent(this, MovieDetailActivity::class.java).apply {
-                    putExtra(SearchActivity.EXTRA_MOVIE_ID, id)
-                }
-                startActivity(intent)
+            getHeroMovieId()?.let { movieId ->
+                navigateToMovieDetail(movieId)
             }
         }
 
         binding.favoriteButton.setOnClickListener {
-            // Toggle favorite for featured movie
-            val movieId = binding.heroSection.tag as? Int
-            movieId?.let { id ->
+            getHeroMovieId()?.let { movieId ->
                 lifecycleScope.launch {
-                    repository.addToLibrary(id)
+                    repository.addToLibrary(movieId)
                     loadFavorites()
                 }
             }
@@ -124,28 +120,17 @@ class MainActivity : AppCompatActivity() {
     private fun loadPopularMovies() {
         lifecycleScope.launch {
             repository.getPopularMovies().collect { response ->
-                when (response) {
-                    is ApiResponse.Loading -> {
-                        // Loading handled by main progress bar
-                    }
-                    is ApiResponse.Success -> {
-                        val movies = response.data
+                response.handle(
+                    onSuccess = { movies ->
                         popularAdapter.submitList(movies)
-
-                        // Use first popular movie as hero if available
                         if (movies.isNotEmpty()) {
                             displayHeroMovie(movies.first())
                         }
-
                         hideLoading()
-                    }
-                    is ApiResponse.Error -> {
-                        hideLoading()
-                    }
-                    is ApiResponse.NetworkError -> {
-                        hideLoading()
-                    }
-                }
+                    },
+                    onError = { _, _ -> hideLoading() },
+                    onNetworkError = { hideLoading() }
+                )
             }
         }
     }
@@ -153,14 +138,11 @@ class MainActivity : AppCompatActivity() {
     private fun loadTopRatedMovies() {
         lifecycleScope.launch {
             repository.getTopRatedMovies().collect { response ->
-                when (response) {
-                    is ApiResponse.Success -> {
-                        topRatedAdapter.submitList(response.data)
+                response.handle(
+                    onSuccess = { movies ->
+                        topRatedAdapter.submitList(movies)
                     }
-                    else -> {
-                        // Handle other states if needed
-                    }
-                }
+                )
             }
         }
     }
@@ -168,25 +150,21 @@ class MainActivity : AppCompatActivity() {
     private fun loadFavorites() {
         lifecycleScope.launch {
             repository.getLibraryMoviesFlow().collectLatest { movies ->
-                if (movies.isNotEmpty()) {
-                    binding.favoritesSection.visibility = View.VISIBLE
+                binding.favoritesSection.visibility = if (movies.isNotEmpty()) {
                     favoritesAdapter.submitList(movies)
+                    View.VISIBLE
                 } else {
-                    binding.favoritesSection.visibility = View.GONE
+                    View.GONE
                 }
             }
         }
     }
 
     private fun displayHeroMovie(movie: Movie) {
-        // Store movie ID in tag for later use
         binding.heroSection.tag = movie.id
-
-        // Set title and overview
         binding.heroTitle.text = movie.title
         binding.heroOverview.text = movie.overview
 
-        // Load backdrop image
         val backdropUrl = Constants.buildPosterUrl(
             movie.posterPath,
             Constants.IMAGE_SIZE_W780
@@ -201,8 +179,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigateToMovieDetail(movie: Movie) {
+        navigateToMovieDetail(movie.id)
+    }
+
+    private fun navigateToMovieDetail(movieId: Int) {
         val intent = Intent(this, MovieDetailActivity::class.java).apply {
-            putExtra(SearchActivity.EXTRA_MOVIE_ID, movie.id)
+            putExtra(SearchActivity.EXTRA_MOVIE_ID, movieId)
         }
         startActivity(intent)
     }

@@ -5,24 +5,35 @@ import android.view.View
 import android.widget.EditText
 import android.widget.RatingBar
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.snackbar.Snackbar
+import com.movielib.base.BaseMovieActivity
+import com.movielib.extensions.handle
 import com.movielib.movielib.R
-import com.movielib.movielib.api.ApiResponse
-import com.movielib.movielib.database.MovieDatabase
 import com.movielib.movielib.databinding.ActivityMovieDetailBinding
 import com.movielib.movielib.models.Movie
-import com.movielib.movielib.repository.MovieRepository
 import com.movielib.movielib.utils.Constants
 import kotlinx.coroutines.launch
 
-class MovieDetailActivity : AppCompatActivity() {
+/**
+ * Movie detail screen showing complete information about a specific movie
+ *
+ * Features:
+ * - Full movie details (title, rating, release date, genres, overview, cast)
+ * - Backdrop and poster images
+ * - Add/remove from personal library
+ * - Rate and review movies (with RatingBar dialog)
+ * - Preserves user data when updating from API
+ *
+ * Receives movie ID via Intent extra: [SearchActivity.EXTRA_MOVIE_ID]
+ *
+ * @see BaseMovieActivity
+ */
+class MovieDetailActivity : BaseMovieActivity() {
 
     private lateinit var binding: ActivityMovieDetailBinding
-    private lateinit var repository: MovieRepository
     private var currentMovie: Movie? = null
 
     companion object {
@@ -36,7 +47,6 @@ class MovieDetailActivity : AppCompatActivity() {
         binding = ActivityMovieDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupRepository()
         setupToolbar()
         setupButtons()
 
@@ -48,11 +58,6 @@ class MovieDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRepository() {
-        val database = MovieDatabase.getDatabase(this)
-        repository = MovieRepository(database.movieDao(), Constants.TMDB_API_KEY)
-    }
-
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
             finish()
@@ -60,22 +65,16 @@ class MovieDetailActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        binding.favoriteButton.setOnClickListener {
-            currentMovie?.let { movie ->
-                toggleFavorite(movie)
-            }
+        val favoriteClickListener = View.OnClickListener {
+            currentMovie?.let { movie -> toggleFavorite(movie) }
         }
 
-        binding.favoriteIcon.setOnClickListener {
-            currentMovie?.let { movie ->
-                toggleFavorite(movie)
-            }
-        }
+        // Both button and icon should do the same thing (DRY principle)
+        binding.favoriteButton.setOnClickListener(favoriteClickListener)
+        binding.favoriteIcon.setOnClickListener(favoriteClickListener)
 
         binding.rateButton.setOnClickListener {
-            currentMovie?.let { movie ->
-                showRatingDialog(movie)
-            }
+            currentMovie?.let { movie -> showRatingDialog(movie) }
         }
     }
 
@@ -84,99 +83,109 @@ class MovieDetailActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repository.getMovieDetails(movieId).collect { response ->
-                when (response) {
-                    is ApiResponse.Loading -> {
-                        showLoading()
-                    }
-                    is ApiResponse.Success -> {
-                        currentMovie = response.data
-                        displayMovieDetails(response.data)
+                response.handle(
+                    onLoading = { showLoading() },
+                    onSuccess = { movie ->
+                        currentMovie = movie
+                        displayMovieDetails(movie)
                         hideLoading()
-                    }
-                    is ApiResponse.Error -> {
+                    },
+                    onError = { message, _ ->
                         hideLoading()
-                        showError(getString(R.string.error_loading_movie_details, response.message))
-                    }
-                    is ApiResponse.NetworkError -> {
+                        showError(getString(R.string.error_loading_movie_details, message))
+                    },
+                    onNetworkError = {
                         hideLoading()
                         showError(getString(R.string.error_network))
                     }
-                }
+                )
             }
         }
     }
 
     private fun displayMovieDetails(movie: Movie) {
-        // Set title
         binding.titleTextView.text = movie.title
         binding.collapsingToolbar.title = movie.title
 
-        // Set rating
         binding.ratingTextView.text = String.format("%.1f", movie.voteAverage)
 
-        // Set release date (just year)
-        movie.releaseDate?.let { date ->
-            val year = date.substringBefore("-")
+        movie.releaseDate?.substringBefore("-")?.let { year ->
             binding.releaseDateTextView.text = year
         }
 
-        // Set genres
-        movie.genres?.let { genres ->
-            binding.genresTextView.text = genres
-        } ?: run {
-            binding.genresTextView.visibility = View.GONE
-        }
+        setTextOrHide(
+            text = movie.genres,
+            textView = binding.genresTextView
+        )
 
-        // Set overview
         binding.overviewTextView.text = movie.overview ?: getString(R.string.no_overview)
 
-        // Set cast
-        movie.cast?.let { cast ->
-            if (cast.isNotEmpty()) {
-                binding.castSection.visibility = View.VISIBLE
-                binding.castTextView.text = cast.replace(",", " • ")
-            }
-        } ?: run {
-            binding.castSection.visibility = View.GONE
-        }
+        setCastOrHide(movie.cast)
 
-        // Load backdrop image
-        val backdropUrl = Constants.buildPosterUrl(
-            movie.posterPath,
-            Constants.IMAGE_SIZE_W780
-        )
-        Glide.with(this)
-            .load(backdropUrl)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .placeholder(R.drawable.placeholder_movie)
-            .error(R.drawable.placeholder_movie)
-            .into(binding.backdropImageView)
+        loadMovieImages(movie.posterPath)
 
-        // Load poster image
-        val posterUrl = Constants.buildPosterUrl(
-            movie.posterPath,
-            Constants.IMAGE_SIZE_W342
-        )
-        Glide.with(this)
-            .load(posterUrl)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .placeholder(R.drawable.placeholder_movie)
-            .error(R.drawable.placeholder_movie)
-            .into(binding.posterImageView)
-
-        // Update favorite status
         updateFavoriteUI(movie.isInLibrary)
 
-        // Show user rating if exists
         movie.userRating?.let { rating ->
             binding.rateButton.text = getString(R.string.rated_label, rating)
         }
     }
 
+    /**
+     * Helper function to set text or hide view if null/empty
+     */
+    private fun setTextOrHide(text: String?, textView: android.widget.TextView) {
+        if (!text.isNullOrEmpty()) {
+            textView.text = text
+            textView.visibility = View.VISIBLE
+        } else {
+            textView.visibility = View.GONE
+        }
+    }
+
+    private fun setCastOrHide(cast: String?) {
+        if (!cast.isNullOrEmpty()) {
+            binding.castSection.visibility = View.VISIBLE
+            binding.castTextView.text = cast.replace(",", " • ")
+        } else {
+            binding.castSection.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Helper function to load both backdrop and poster images (DRY principle)
+     */
+    private fun loadMovieImages(posterPath: String?) {
+        loadImageIntoView(
+            posterPath,
+            Constants.IMAGE_SIZE_W780,
+            binding.backdropImageView
+        )
+
+        loadImageIntoView(
+            posterPath,
+            Constants.IMAGE_SIZE_W342,
+            binding.posterImageView
+        )
+    }
+
+    private fun loadImageIntoView(
+        posterPath: String?,
+        imageSize: String,
+        imageView: android.widget.ImageView
+    ) {
+        val imageUrl = Constants.buildPosterUrl(posterPath, imageSize)
+        Glide.with(this)
+            .load(imageUrl)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .placeholder(R.drawable.placeholder_movie)
+            .error(R.drawable.placeholder_movie)
+            .into(imageView)
+    }
+
     private fun toggleFavorite(movie: Movie) {
         lifecycleScope.launch {
             if (movie.isInLibrary) {
-                // Remove from library
                 repository.removeFromLibrary(movie.id)
                 currentMovie = movie.copy(
                     isInLibrary = false,
@@ -186,7 +195,6 @@ class MovieDetailActivity : AppCompatActivity() {
                 updateFavoriteUI(false)
                 showSnackbar(getString(R.string.removed_from_library))
             } else {
-                // Add to library
                 repository.addToLibrary(movie.id)
                 currentMovie = movie.copy(isInLibrary = true)
                 updateFavoriteUI(true)
@@ -197,12 +205,16 @@ class MovieDetailActivity : AppCompatActivity() {
 
     private fun updateFavoriteUI(isInLibrary: Boolean) {
         if (isInLibrary) {
-            binding.favoriteButton.text = getString(R.string.remove_from_list)
-            binding.favoriteButton.strokeWidth = 0
+            binding.favoriteButton.apply {
+                text = getString(R.string.remove_from_list)
+                strokeWidth = 0
+            }
             binding.favoriteIcon.setImageResource(R.drawable.ic_favorite_filled)
         } else {
-            binding.favoriteButton.text = getString(R.string.add_to_list)
-            binding.favoriteButton.strokeWidth = 2
+            binding.favoriteButton.apply {
+                text = getString(R.string.add_to_list)
+                strokeWidth = 2
+            }
             binding.favoriteIcon.setImageResource(R.drawable.ic_favorite_border)
         }
     }
@@ -212,7 +224,6 @@ class MovieDetailActivity : AppCompatActivity() {
         val ratingBar = dialogView.findViewById<RatingBar>(R.id.ratingBar)
         val reviewEditText = dialogView.findViewById<EditText>(R.id.reviewEditText)
 
-        // Set existing rating and review if available
         movie.userRating?.let { rating ->
             ratingBar.rating = rating / RATING_SCALE_FACTOR
         }
@@ -224,7 +235,6 @@ class MovieDetailActivity : AppCompatActivity() {
             .setPositiveButton(getString(R.string.save)) { _, _ ->
                 val rating = ratingBar.rating * RATING_SCALE_FACTOR
                 val review = reviewEditText.text.toString().trim()
-
                 saveRatingAndReview(movie, rating, review)
             }
             .setNegativeButton(getString(R.string.cancel), null)
@@ -233,29 +243,24 @@ class MovieDetailActivity : AppCompatActivity() {
 
     private fun saveRatingAndReview(movie: Movie, rating: Float, review: String) {
         lifecycleScope.launch {
-            // Make sure movie is in library first
             if (!movie.isInLibrary) {
                 repository.addToLibrary(movie.id)
             }
 
-            // Update rating
             if (rating > 0) {
                 repository.updateUserRating(movie.id, rating)
             }
 
-            // Update review
             if (review.isNotEmpty()) {
                 repository.updateUserReview(movie.id, review)
             }
 
-            // Update current movie
             currentMovie = movie.copy(
                 isInLibrary = true,
                 userRating = if (rating > 0) rating else movie.userRating,
                 userReview = if (review.isNotEmpty()) review else movie.userReview
             )
 
-            // Update UI
             updateFavoriteUI(true)
             binding.rateButton.text = getString(R.string.rated_label, rating)
 

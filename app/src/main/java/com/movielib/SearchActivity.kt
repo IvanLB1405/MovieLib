@@ -5,25 +5,32 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.movielib.adapters.MovieAdapter
+import com.movielib.base.BaseMovieActivity
+import com.movielib.extensions.handle
 import com.movielib.movielib.R
-import com.movielib.movielib.api.ApiResponse
-import com.movielib.movielib.database.MovieDatabase
 import com.movielib.movielib.databinding.ActivitySearchBinding
 import com.movielib.movielib.models.Movie
-import com.movielib.movielib.repository.MovieRepository
-import com.movielib.movielib.utils.Constants
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SearchActivity : AppCompatActivity() {
+/**
+ * Search screen activity for finding movies by text query
+ *
+ * Features:
+ * - Real-time search with debouncing (500ms delay)
+ * - Grid layout for search results
+ * - Empty, loading, no results, and success states
+ * - Direct navigation to movie details
+ *
+ * @see BaseMovieActivity
+ */
+class SearchActivity : BaseMovieActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private lateinit var repository: MovieRepository
     private lateinit var adapter: MovieAdapter
     private var searchJob: Job? = null
 
@@ -38,15 +45,9 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupRepository()
         setupRecyclerView()
         setupSearchBar()
         setupBackButton()
-    }
-
-    private fun setupRepository() {
-        val database = MovieDatabase.getDatabase(this)
-        repository = MovieRepository(database.movieDao(), Constants.TMDB_API_KEY)
     }
 
     private fun setupRecyclerView() {
@@ -65,7 +66,6 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Cancel previous search job
                 searchJob?.cancel()
 
                 val query = s?.toString()?.trim() ?: ""
@@ -73,7 +73,6 @@ class SearchActivity : AppCompatActivity() {
                 if (query.isEmpty()) {
                     showEmptyState()
                 } else {
-                    // Debounce search
                     searchJob = lifecycleScope.launch {
                         delay(SEARCH_DEBOUNCE_DELAY)
                         searchMovies(query)
@@ -84,7 +83,6 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Set focus on search field
         binding.searchEditText.requestFocus()
     }
 
@@ -97,59 +95,73 @@ class SearchActivity : AppCompatActivity() {
     private fun searchMovies(query: String) {
         lifecycleScope.launch {
             repository.searchMovies(query).collect { response ->
-                when (response) {
-                    is ApiResponse.Loading -> {
-                        showLoadingState()
-                    }
-                    is ApiResponse.Success -> {
-                        val movies = response.data
+                response.handle(
+                    onLoading = { showLoadingState() },
+                    onSuccess = { movies ->
                         if (movies.isEmpty()) {
                             showNoResultsState(query)
                         } else {
                             showResultsState(movies)
                         }
-                    }
-                    is ApiResponse.Error -> {
-                        showNoResultsState(query)
-                    }
-                    is ApiResponse.NetworkError -> {
-                        showNoResultsState(query)
-                    }
-                }
+                    },
+                    onError = { _, _ -> showNoResultsState(query) },
+                    onNetworkError = { showNoResultsState(query) }
+                )
             }
         }
     }
 
     private fun showEmptyState() {
-        binding.emptyStateLayout.visibility = View.VISIBLE
-        binding.noResultsLayout.visibility = View.GONE
-        binding.searchResultsRecyclerView.visibility = View.GONE
-        binding.searchProgressBar.visibility = View.GONE
+        setViewsVisibility(
+            emptyState = true,
+            noResults = false,
+            results = false,
+            loading = false
+        )
     }
 
     private fun showLoadingState() {
-        binding.emptyStateLayout.visibility = View.GONE
-        binding.noResultsLayout.visibility = View.GONE
-        binding.searchResultsRecyclerView.visibility = View.GONE
-        binding.searchProgressBar.visibility = View.VISIBLE
+        setViewsVisibility(
+            emptyState = false,
+            noResults = false,
+            results = false,
+            loading = true
+        )
     }
 
     private fun showNoResultsState(query: String) {
-        binding.emptyStateLayout.visibility = View.GONE
-        binding.noResultsLayout.visibility = View.VISIBLE
-        binding.searchResultsRecyclerView.visibility = View.GONE
-        binding.searchProgressBar.visibility = View.GONE
-
+        setViewsVisibility(
+            emptyState = false,
+            noResults = true,
+            results = false,
+            loading = false
+        )
         binding.noResultsDescription.text = getString(R.string.no_results_for_query, query)
     }
 
     private fun showResultsState(movies: List<Movie>) {
-        binding.emptyStateLayout.visibility = View.GONE
-        binding.noResultsLayout.visibility = View.GONE
-        binding.searchResultsRecyclerView.visibility = View.VISIBLE
-        binding.searchProgressBar.visibility = View.GONE
-
+        setViewsVisibility(
+            emptyState = false,
+            noResults = false,
+            results = true,
+            loading = false
+        )
         adapter.submitList(movies)
+    }
+
+    /**
+     * Helper function to manage all view states in one place (DRY principle)
+     */
+    private fun setViewsVisibility(
+        emptyState: Boolean,
+        noResults: Boolean,
+        results: Boolean,
+        loading: Boolean
+    ) {
+        binding.emptyStateLayout.visibility = if (emptyState) View.VISIBLE else View.GONE
+        binding.noResultsLayout.visibility = if (noResults) View.VISIBLE else View.GONE
+        binding.searchResultsRecyclerView.visibility = if (results) View.VISIBLE else View.GONE
+        binding.searchProgressBar.visibility = if (loading) View.VISIBLE else View.GONE
     }
 
     private fun navigateToMovieDetail(movie: Movie) {

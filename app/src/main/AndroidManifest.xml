@@ -49,7 +49,7 @@
 
         <!-- API Test Activity - Para pruebas de desarrollo -->
         <activity
-            android:name="com.movielib.app.ApiTestActivity"
+            android:name="com.movielib.ApiTestActivity"
             android:exported="false" />
 
     </application>

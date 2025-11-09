@@ -3,23 +3,34 @@ package com.movielib
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.movielib.adapters.MovieAdapter
 import com.movielib.adapters.MovieReviewAdapter
-import com.movielib.movielib.database.MovieDatabase
+import com.movielib.base.BaseMovieActivity
 import com.movielib.movielib.databinding.ActivityLibraryBinding
-import com.movielib.movielib.repository.MovieRepository
-import com.movielib.movielib.utils.Constants
+import com.movielib.movielib.models.Movie
+import com.movielib.movielib.repository.LibraryStats
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class LibraryActivity : AppCompatActivity() {
+/**
+ * Library screen displaying user's personal movie collection
+ *
+ * Features:
+ * - Statistics section (total movies, average rating, total reviews)
+ * - Grid view of all movies in library
+ * - Separate section for movies with reviews
+ * - Empty state when library is empty
+ * - Auto-refresh when returning from detail screen (onResume)
+ *
+ * @see BaseMovieActivity
+ * @see LibraryStats
+ */
+class LibraryActivity : BaseMovieActivity() {
 
     private lateinit var binding: ActivityLibraryBinding
-    private lateinit var repository: MovieRepository
     private lateinit var adapter: MovieAdapter
     private lateinit var reviewsAdapter: MovieReviewAdapter
 
@@ -32,21 +43,14 @@ class LibraryActivity : AppCompatActivity() {
         binding = ActivityLibraryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupRepository()
         setupToolbar()
-        setupRecyclerView()
+        setupRecyclerViews()
         loadLibrary()
     }
 
     override fun onResume() {
         super.onResume()
-        // Reload library when returning from detail
         loadLibrary()
-    }
-
-    private fun setupRepository() {
-        val database = MovieDatabase.getDatabase(this)
-        repository = MovieRepository(database.movieDao(), Constants.TMDB_API_KEY)
     }
 
     private fun setupToolbar() {
@@ -55,8 +59,7 @@ class LibraryActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRecyclerView() {
-        // Setup main library grid
+    private fun setupRecyclerViews() {
         adapter = MovieAdapter(MovieAdapter.LayoutType.GRID) { movie ->
             navigateToMovieDetail(movie.id)
         }
@@ -66,7 +69,6 @@ class LibraryActivity : AppCompatActivity() {
             adapter = this@LibraryActivity.adapter
         }
 
-        // Setup reviews list
         reviewsAdapter = MovieReviewAdapter { movie ->
             navigateToMovieDetail(movie.id)
         }
@@ -81,14 +83,11 @@ class LibraryActivity : AppCompatActivity() {
         showLoading()
 
         lifecycleScope.launch {
-            // Load library stats
             val stats = repository.getLibraryStats()
             displayStats(stats)
 
-            // Load movies with reviews
             loadReviews()
 
-            // Load library movies
             repository.getLibraryMoviesFlow().collectLatest { movies ->
                 hideLoading()
 
@@ -105,17 +104,17 @@ class LibraryActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val reviewedMovies = repository.getMoviesWithReviews()
 
-            if (reviewedMovies.isNotEmpty()) {
-                binding.reviewsSection.visibility = View.VISIBLE
+            binding.reviewsSection.visibility = if (reviewedMovies.isNotEmpty()) {
                 binding.reviewsCountText.text = reviewedMovies.size.toString()
                 reviewsAdapter.submitList(reviewedMovies)
+                View.VISIBLE
             } else {
-                binding.reviewsSection.visibility = View.GONE
+                View.GONE
             }
         }
     }
 
-    private fun displayStats(stats: com.movielib.movielib.repository.LibraryStats) {
+    private fun displayStats(stats: LibraryStats) {
         binding.totalMoviesText.text = stats.totalMovies.toString()
         binding.averageRatingText.text = String.format("%.1f", stats.averageRating)
         binding.reviewedMoviesText.text = stats.moviesWithReviews.toString()
@@ -126,7 +125,7 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryRecyclerView.visibility = View.GONE
     }
 
-    private fun showMovies(movies: List<com.movielib.movielib.models.Movie>) {
+    private fun showMovies(movies: List<Movie>) {
         binding.emptyStateLayout.visibility = View.GONE
         binding.libraryRecyclerView.visibility = View.VISIBLE
         adapter.submitList(movies)

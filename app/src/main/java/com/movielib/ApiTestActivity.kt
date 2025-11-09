@@ -1,105 +1,71 @@
-package com.movielib.app
+package com.movielib
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.movielib.movielib.api.ApiResponse
-import com.movielib.movielib.repository.MovieRepository
+import com.movielib.base.BaseMovieActivity
+import com.movielib.extensions.handle
+import com.movielib.movielib.R
 import kotlinx.coroutines.launch
-import com.movielib.movielib.database.MovieDatabase
-import com.movielib.movielib.utils.Constants
 
-class ApiTestActivity : AppCompatActivity() {
-
-    private lateinit var movieRepository: MovieRepository
+/**
+ * Test activity for verifying API and Repository functionality
+ * For development and debugging purposes only
+ */
+class ApiTestActivity : BaseMovieActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Crear un layout simple para mostrar que está funcionando
+        // Create simple layout to show tests are running
         val textView = android.widget.TextView(this)
-        textView.text = "🚀 MovieLib API Test\n\n🔄 Ejecutando pruebas...\n\n📱 Revisa el Logcat para ver los resultados detallados\n\nFiltro: API_TEST"
+        textView.text = getString(R.string.api_test_message)
         textView.gravity = android.view.Gravity.CENTER
         textView.textSize = 16f
         textView.setPadding(32, 32, 32, 32)
         setContentView(textView)
 
-        try {
-            val database = MovieDatabase.getDatabase(this)
-            val movieDao = database.movieDao()
-            movieRepository = MovieRepository(movieDao, Constants.TMDB_API_KEY)
-
-            testApiConnection()
-
-        } catch (e: Exception) {
-            // Error initializing repository
-        }
+        testApiConnection()
     }
 
     private fun testApiConnection() {
         lifecycleScope.launch {
-            try {
-                testSearchMovies()
-                testPopularMovies()
-                testMovieDetails()
-                testLocalDatabase()
-            } catch (e: Exception) {
-                // Error in API test
-            }
+            testSearchMovies()
+            testPopularMovies()
+            testMovieDetails()
+            testLocalDatabase()
         }
     }
 
     private suspend fun testSearchMovies() {
-        try {
-            movieRepository.searchMovies("Avengers").collect { response ->
-                when (response) {
-                    is ApiResponse.Loading -> {}
-                    is ApiResponse.Success -> {}
-                    is ApiResponse.Error -> {}
-                    is ApiResponse.NetworkError -> {}
-                }
-            }
-        } catch (e: Exception) {
-            // Search error
+        repository.searchMovies("Avengers").collect { response ->
+            response.handle(
+                onSuccess = { /* Test passed - movies received */ },
+                onError = { _, _ -> /* Error handled silently for test */ }
+            )
         }
     }
 
     private suspend fun testPopularMovies() {
-        try {
-            movieRepository.getPopularMovies().collect { response ->
-                when (response) {
-                    is ApiResponse.Loading -> {}
-                    is ApiResponse.Success -> {}
-                    is ApiResponse.Error -> {}
-                    is ApiResponse.NetworkError -> {}
-                }
-            }
-        } catch (e: Exception) {
-            // Popular movies error
+        repository.getPopularMovies().collect { response ->
+            response.handle(
+                onSuccess = { /* Test passed - popular movies received */ },
+                onError = { _, _ -> /* Error handled silently for test */ }
+            )
         }
     }
 
     private suspend fun testMovieDetails() {
-        try {
-            movieRepository.getMovieDetails(299534).collect { response ->
-                when (response) {
-                    is ApiResponse.Loading -> {}
-                    is ApiResponse.Success -> {}
-                    is ApiResponse.Error -> {}
-                    is ApiResponse.NetworkError -> {}
-                }
-            }
-        } catch (e: Exception) {
-            // Movie details error
+        repository.getMovieDetails(299534).collect { response ->
+            response.handle(
+                onSuccess = { /* Test passed - movie details received */ },
+                onError = { _, _ -> /* Error handled silently for test */ }
+            )
         }
     }
 
     private suspend fun testLocalDatabase() {
-        try {
-            val libraryMovies = movieRepository.getLibraryMovies()
-            val stats = movieRepository.getLibraryStats()
-        } catch (e: Exception) {
-            // Database error
-        }
+        // Test local database operations
+        repository.getLibraryMovies()
+        repository.getLibraryStats()
     }
 }

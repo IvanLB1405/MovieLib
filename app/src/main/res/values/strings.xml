@@ -61,4 +61,7 @@
     <string name="cd_favorite_icon">Add to favorites</string>
     <string name="cd_play_button">Play movie</string>
     <string name="cd_back_button">Go back</string>
+
+    <!-- API Test (Debug only) -->
+    <string name="api_test_message">🚀 MovieLib API Test\n\n🔄 Executing tests...\n\n📱 Check Logcat for detailed results\n\nFilter: API_TEST</string>
 </resources>
