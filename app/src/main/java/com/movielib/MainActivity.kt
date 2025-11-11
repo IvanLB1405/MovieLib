@@ -19,37 +19,107 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
- * Main screen activity displaying popular movies, top rated, and user's library
+ * Pantalla principal que muestra películas populares, mejor valoradas y biblioteca del usuario
  *
- * Features:
- * - Hero section with featured movie
- * - Horizontal lists of popular and top-rated movies
- * - User's personal library section (visible only if not empty)
- * - Navigation to search and library screens
+ * ACTIVITY LIFECYCLE:
+ * Una Activity pasa por varios estados desde que se crea hasta que se destruye:
+ * onCreate() → onStart() → onResume() → [Running] → onPause() → onStop() → onDestroy()
  *
- * @see BaseMovieActivity
+ * CARACTERÍSTICAS:
+ * - Sección hero con película destacada
+ * - Listas horizontales de películas populares y mejor valoradas
+ * - Sección de biblioteca personal (visible solo si no está vacía)
+ * - Navegación a pantallas de búsqueda y biblioteca
+ *
+ * ARQUITECTURA:
+ * - Extiende BaseMovieActivity para acceso al repository
+ * - Usa ViewBinding para acceso type-safe a las vistas
+ * - Usa Kotlin Coroutines para operaciones asíncronas
+ * - Usa Flow para streams de datos reactivos
+ *
+ * @see BaseMovieActivity Clase base que proporciona el repository
  */
 class MainActivity : BaseMovieActivity() {
 
+    /**
+     * ViewBinding que contiene referencias type-safe a todas las vistas del layout
+     *
+     * LATEINIT:
+     * - Promete que la variable será inicializada antes de usarse
+     * - Permite declarar variables no-nullable sin inicializarlas en el constructor
+     * - Lanzará excepción si se usa antes de inicializar
+     */
     private lateinit var binding: ActivityMainBinding
 
+    /**
+     * Adapters para los tres RecyclerViews de la pantalla
+     *
+     * Cada adapter gestiona una lista diferente de películas:
+     * - popularAdapter: Películas populares actualmente
+     * - topRatedAdapter: Películas mejor valoradas por la comunidad
+     * - favoritesAdapter: Películas en la biblioteca personal del usuario
+     */
     private lateinit var popularAdapter: MovieAdapter
     private lateinit var topRatedAdapter: MovieAdapter
     private lateinit var favoritesAdapter: MovieAdapter
 
+    /**
+     * Primer método del lifecycle llamado cuando se crea la Activity
+     *
+     * ONCREATE SE LLAMA:
+     * - Primera vez que se lanza la Activity
+     * - Después de onDestroy() (recreación completa)
+     * - Después de cambio de configuración (rotación de pantalla)
+     *
+     * ORDEN DE INICIALIZACIÓN:
+     * 1. Inflar el layout con ViewBinding
+     * 2. Establecer el layout como contenido de la Activity
+     * 3. Configurar RecyclerViews
+     * 4. Configurar listeners de clicks
+     * 5. Configurar la sección hero
+     * 6. Cargar datos desde la API
+     *
+     * @param savedInstanceState Estado guardado de la Activity (null si es primera vez)
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Llamar a la implementación de la clase padre PRIMERO (requerido)
         super.onCreate(savedInstanceState)
+
+        // Inflar el layout usando ViewBinding
+        // layoutInflater es proporcionado por Activity para convertir XML en Views
         binding = ActivityMainBinding.inflate(layoutInflater)
+
+        // Establecer el layout como contenido de esta Activity
+        // binding.root es el ViewGroup raíz del layout
         setContentView(binding.root)
 
+        // Configurar todos los componentes en orden lógico
         setupRecyclerViews()
         setupClickListeners()
         setupHeroSection()
         loadData()
     }
 
+    /**
+     * Llamado cuando la Activity vuelve a primer plano (se hace visible e interactiva)
+     *
+     * ONRESUME SE LLAMA:
+     * - Después de onCreate() y onStart() (primera vez)
+     * - Al volver de onPause() (ej: volviendo de otra Activity)
+     * - Al volver de onStop() vía onRestart() → onStart() → onResume()
+     *
+     * USO TÍPICO:
+     * - Reanudar animaciones pausadas
+     * - Refrescar datos que podrían haber cambiado
+     * - Reiniciar listeners o sensores
+     *
+     * AQUÍ:
+     * Recargamos la biblioteca porque el usuario podría haber añadido/eliminado
+     * películas en MovieDetailActivity y necesitamos refrescar la lista.
+     */
     override fun onResume() {
         super.onResume()
+        // Recargar favoritos porque podrían haber cambiado en otra pantalla
         loadFavorites()
     }
 
@@ -117,19 +187,64 @@ class MainActivity : BaseMovieActivity() {
         loadFavorites()
     }
 
+    /**
+     * Carga las películas populares desde el repository
+     *
+     * KOTLIN COROUTINES:
+     * Las coroutines son hilos ligeros de Kotlin para programación asíncrona.
+     * Permiten escribir código asíncrono de forma secuencial (sin callbacks anidados).
+     *
+     * LIFECYCLESCOPE:
+     * - Scope ligado al lifecycle de la Activity
+     * - Cancela automáticamente las coroutines cuando la Activity se destruye
+     * - Evita memory leaks y crashes por usar Activities destruidas
+     *
+     * LAUNCH:
+     * - Inicia una nueva coroutine (no bloquea el thread principal)
+     * - No retorna resultado (usa "fire and forget")
+     * - Para retornar resultado se usa "async" + "await"
+     *
+     * FLOW:
+     * - Stream de datos asíncrono (como RxJava Observable o LiveData)
+     * - Emite múltiples valores a lo largo del tiempo
+     * - Cold stream: no emite hasta que alguien lo "colecta"
+     *
+     * COLLECT:
+     * - Terminal operator que "consume" el Flow
+     * - Función suspendible que recibe cada valor emitido
+     * - Se ejecuta en el contexto de la coroutine (thread seguro)
+     *
+     * FLUJO DE EJECUCIÓN:
+     * 1. lifecycleScope.launch{} crea una coroutine ligada a la Activity
+     * 2. repository.getPopularMovies() retorna un Flow<ApiResponse<List<Movie>>>
+     * 3. .collect{} empieza a recibir valores del Flow
+     * 4. Primero emite ApiResponse.Loading
+     * 5. Luego emite ApiResponse.Success con las películas (o Error/NetworkError)
+     * 6. response.handle{} procesa cada estado emitido
+     * 7. onSuccess actualiza el adapter y muestra la primera película en hero
+     */
     private fun loadPopularMovies() {
+        // Iniciar coroutine ligada al lifecycle de la Activity
         lifecycleScope.launch {
+            // Obtener Flow de películas populares
             repository.getPopularMovies().collect { response ->
+                // Manejar cada estado emitido por el Flow usando extension function
                 response.handle(
                     onSuccess = { movies ->
+                        // Actualizar el adapter con la lista de películas
+                        // submitList() usa DiffUtil automáticamente (eficiente)
                         popularAdapter.submitList(movies)
+
+                        // Si hay películas, mostrar la primera en la sección hero
                         if (movies.isNotEmpty()) {
                             displayHeroMovie(movies.first())
                         }
+
+                        // Ocultar indicador de carga
                         hideLoading()
                     },
-                    onError = { _, _ -> hideLoading() },
-                    onNetworkError = { hideLoading() }
+                    onError = { _, _ -> hideLoading() },      // Ocultar loading en error
+                    onNetworkError = { hideLoading() }        // Ocultar loading en error de red
                 )
             }
         }

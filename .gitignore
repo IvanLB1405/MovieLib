@@ -14,5 +14,7 @@
 .cxx
 local.properties
 
-# Project-specific files
-CLAUDE.md
+# Documentación técnica (entregables separados - no subir a git)
+DOCUMENTACION_TECNICA.md
+DOCUMENTACION_TECNICA.pdf
+COMO_GENERAR_PDF.txt

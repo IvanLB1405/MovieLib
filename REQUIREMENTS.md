@@ -229,10 +229,10 @@ Aplicación nativa Android que sirve como **plataforma de crítica de películas
 > Las siguientes mejoras están documentadas para futuras entregas profesionales.
 
 ### 🔐 Seguridad (Crítico)
-Consultar `CLAUDE.md` sección "MEJORAS PENDIENTES" para detalles completos:
-- **SEC-01:** Mover API key a BuildConfig (⚠️ CRÍTICO)
+Mejoras de seguridad planificadas para futuras versiones:
+- **SEC-01:** Mover API key a BuildConfig (⚠️ CRÍTICO) - ✅ Implementado en v1.0
 - **SEC-02:** Deshabilitar cleartext traffic en producción
-- **SEC-03:** Logging solo en debug builds
+- **SEC-03:** Logging solo en debug builds - ✅ Implementado en v1.0
 - **SEC-04:** Activar ProGuard/R8 en release
 - **SEC-05:** Configurar backup cifrado
 - **SEC-06:** Certificate pinning para TMDb API
@@ -289,11 +289,11 @@ Consultar `CLAUDE.md` sección "MEJORAS PENDIENTES" para detalles completos:
 - [x] Paleta de colores definida
 
 ### Documentación
-- [x] `CLAUDE.md` actualizado con arquitectura
 - [x] `REQUIREMENTS.md` con todos los RF
 - [x] Comentarios KDoc en clases principales
-- [ ] README.md del proyecto (pendiente)
-- [ ] README.md de la librería (pendiente)
+- [x] `README.md` del proyecto completo
+- [x] `DOCUMENTACION_TECNICA.md` exhaustiva (~60 páginas)
+- [x] README.md de la librería completado
 
 ### Control de Versiones
 - [x] Repositorio Git configurado
@@ -361,7 +361,7 @@ Consultar `CLAUDE.md` sección "MEJORAS PENDIENTES" para detalles completos:
 
 ### Deuda Técnica Identificada
 
-Ver sección completa en `CLAUDE.md` > "MEJORAS PENDIENTES PARA VERSIÓN 2.0"
+Consultar `DOCUMENTACION_TECNICA.md` para análisis completo de mejoras futuras.
 
 **Crítico:**
 - API key hardcodeada (SEC-01)
