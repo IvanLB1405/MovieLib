@@ -34,7 +34,7 @@ Facilitar la integración de funcionalidades relacionadas con información de pe
   - Imagen de portada (poster)
   - Año de publicación
   - Valoración media
-- **Tecnología:** RecyclerView con ViewBinding y DiffUtil
+- **Tecnología:** RecyclerView con ViewBinding
 - **Layouts soportados:** Horizontal y Grid (3 columnas)
 - **Estado:** Implementado
 
@@ -312,6 +312,7 @@ Para consultas sobre el proyecto:
 **Documento de Requisitos v1.0** - MovieLib Project
 **Fecha de Entrega:** 2025-11-11
 **Estado:** COMPLETADO
+
 
 
 
