@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
  * Entidad Room que representa una película en la base de datos local
  *
  * Esta clase cumple dos funciones principales:
- * 1. Almacena los datos de películas obtenidos de la API de TMDb (caché)
+ * 1. Almacena los datos de películas obtenidos de la API de TMDb (en caché)
  * 2. Guarda la información personalizada del usuario (biblioteca, ratings, reseñas)
  *
  * @property id Identificador único de la película en TMDb (clave primaria de la base de datos)
@@ -16,12 +16,12 @@ import androidx.room.PrimaryKey
  * @property posterPath Ruta relativa del póster en TMDb (se combina con IMAGE_BASE_URL para obtener la URL completa)
  * @property releaseDate Fecha de estreno en formato "YYYY-MM-DD" (puede ser null)
  * @property voteAverage Puntuación promedio de TMDb (0.0 - 10.0)
- * @property genres Géneros de la película como string separado por comas (ej: "Acción,Aventura")
- * @property cast Reparto principal como string separado por comas (ej: "Actor1,Actor2,Actor3")
+ * @property genres Géneros de la película como string separado por comas
+ * @property cast Reparto principal como string separado por comas
  * @property isInLibrary Flag que indica si el usuario añadió esta película a su biblioteca personal
  * @property userRating Puntuación personal del usuario (0.0 - 10.0), null si no ha puntuado
  * @property userReview Reseña escrita por el usuario, null si no ha escrito una
- * @property dateAdded Timestamp (milisegundos desde epoch) de cuando se añadió a la biblioteca
+ * @property dateAdded Timestamp de cuando se añadió a la biblioteca
  *
  * @see MovieDao Para operaciones de base de datos con esta entidad
  * @see MovieApiModel Para el modelo que viene directamente de la API
@@ -46,7 +46,7 @@ data class Movie(
 /**
  * Modelo para la respuesta de la API de búsqueda de películas
  *
- * TMDb devuelve resultados paginados para no sobrecargar la red ni el cliente.
+ * TMDb devuelve resultados paginados para no sobrecargar la red.
  *
  * @property page Número de página actual (primera página = 1)
  * @property results Lista de películas en esta página
@@ -63,13 +63,13 @@ data class MovieSearchResponse(
 /**
  * Modelo que representa una película como viene de la API externa (TMDb)
  *
- * NOTA: Los nombres de propiedades usan snake_case porque así vienen de la API JSON.
+ * NOTA: Los nombres de propiedades usan snake_case porque vienen así de la API JSON.
  * Gson los convierte automáticamente sin necesidad de anotaciones @SerializedName.
  *
  * @property id Identificador único de la película en TMDb
  * @property title Título de la película
  * @property overview Sinopsis o descripción
- * @property poster_path Ruta relativa del póster (requiere concatenar con BASE_URL)
+ * @property poster_path Ruta relativa del póster (hay que concatenar con BASE_URL)
  * @property release_date Fecha de estreno en formato "YYYY-MM-DD"
  * @property vote_average Puntuación promedio de la comunidad (0.0 - 10.0)
  * @property genre_ids Lista de IDs de géneros (se usa para búsquedas simples)
@@ -123,10 +123,6 @@ data class Genre(
 
 /**
  * Modelo para créditos (reparto y equipo)
- *
- * Actualmente solo se usa el reparto (cast), pero la API también puede incluir
- * el equipo técnico (crew) si se necesita en el futuro.
- *
  * @property cast Lista de actores que participan en la película
  */
 data class Credits(
@@ -148,16 +144,16 @@ data class CastMember(
     val profile_path: String?
 )
 
-// ======================== FUNCIONES DE EXTENSIÓN ========================
+// FUNCIONES DE EXTENSIÓN 
 
 /**
  * Extensión para convertir un modelo simple de API a entidad Room
  *
- * Esta función se usa cuando obtenemos listas de películas (búsquedas, populares, etc.)
+ * Esta función la usamos cuando obtenemos listas de películas (búsquedas, populares, etc.)
  * donde solo vienen los datos básicos sin géneros ni reparto detallado.
  *
  * Los campos de usuario (isInLibrary, userRating, etc.) se inicializan con valores por defecto.
- * Si la película ya existe en la base de datos, Room usará REPLACE strategy preservando
+ * Si la película ya existe en la base de datos, Room usa REPLACE preservando
  * los datos del usuario si se manejan correctamente en el Repository.
  *
  * @return Objeto Movie listo para guardar en la base de datos Room
@@ -177,15 +173,15 @@ fun MovieApiModel.toMovie(): Movie {
 /**
  * Extensión para convertir un modelo detallado de API a entidad Room
  *
- * Esta función se usa cuando obtenemos detalles completos de una película específica.
+ * Esta función la usamos cuando obtenemos detalles completos de una película específica.
  * Incluye la conversión de géneros y reparto a strings separados por comas para
  * almacenamiento simple en SQLite (sin necesidad de tablas relacionales).
  *
  * CONVERSIONES APLICADAS:
  * - Géneros: Lista de objetos Genre → String "Acción,Aventura,Ciencia ficción"
- * - Reparto: Lista de CastMember → String "Actor1,Actor2,Actor3" (solo primeros 5)
+ * - Reparto: Lista de CastMember → String "Actor1,Actor2,Actor3"
  *
- * NOTA: Solo se guardan los primeros 5 actores para ahorrar espacio en base de datos.
+ * NOTA: Solo se guardan los primeros 5 actores para ahorrar espacio en DB.
  *
  * @return Objeto Movie con información completa listo para Room
  */
@@ -202,4 +198,5 @@ fun MovieDetailApiModel.toMovie(): Movie {
         // Tomar solo los primeros 5 actores y unir sus nombres con comas
         cast = this.credits?.cast?.take(5)?.joinToString(",") { it.name }
     )
+
 }
