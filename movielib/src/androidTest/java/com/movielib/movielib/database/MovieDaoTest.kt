@@ -42,11 +42,11 @@ class MovieDaoTest {
         database.close()
     }
 
-    // ===== Insert Tests =====
+    // ===== Tests de Inserción =====
 
     @Test
     fun insertMovie_andGetById_returnsCorrectMovie() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 1,
             title = "Test Movie",
@@ -56,11 +56,11 @@ class MovieDaoTest {
             voteAverage = 8.5
         )
 
-        // Act
+        // Actuar
         movieDao.insertMovie(movie)
         val retrieved = movieDao.getMovieById(1)
 
-        // Assert
+        // Verificar
         assertNotNull(retrieved)
         assertEquals(movie.id, retrieved?.id)
         assertEquals(movie.title, retrieved?.title)
@@ -70,20 +70,20 @@ class MovieDaoTest {
 
     @Test
     fun insertMovies_insertsMultipleMovies() = runTest {
-        // Arrange
+        // Preparar
         val movies = listOf(
             Movie(1, "Movie 1", "Overview 1", "/p1.jpg", "2024-01-01", 7.0),
             Movie(2, "Movie 2", "Overview 2", "/p2.jpg", "2024-02-01", 8.0),
             Movie(3, "Movie 3", "Overview 3", "/p3.jpg", "2024-03-01", 9.0)
         )
 
-        // Act
+        // Actuar
         movieDao.insertMovies(movies)
         val movie1 = movieDao.getMovieById(1)
         val movie2 = movieDao.getMovieById(2)
         val movie3 = movieDao.getMovieById(3)
 
-        // Assert
+        // Verificar
         assertNotNull(movie1)
         assertNotNull(movie2)
         assertNotNull(movie3)
@@ -94,7 +94,7 @@ class MovieDaoTest {
 
     @Test
     fun insertMovie_withSameId_replacesExisting() = runTest {
-        // Arrange
+        // Preparar
         val originalMovie = Movie(
             id = 100,
             title = "Original Title",
@@ -113,24 +113,24 @@ class MovieDaoTest {
             voteAverage = 9.0
         )
 
-        // Act
+        // Actuar
         movieDao.insertMovie(originalMovie)
         val beforeUpdate = movieDao.getMovieById(100)
 
         movieDao.insertMovie(updatedMovie)
         val afterUpdate = movieDao.getMovieById(100)
 
-        // Assert
+        // Verificar
         assertEquals("Original Title", beforeUpdate?.title)
         assertEquals("Updated Title", afterUpdate?.title)
         assertEquals(9.0, afterUpdate?.voteAverage ?: 0.0, 0.001)
     }
 
-    // ===== Library Operations Tests =====
+    // ===== Tests de Operaciones de Biblioteca =====
 
     @Test
     fun addToLibrary_setsIsInLibraryToTrue() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 200,
             title = "Library Movie",
@@ -142,18 +142,18 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Act
+        // Actuar
         movieDao.addToLibrary(200)
         val updated = movieDao.getMovieById(200)
 
-        // Assert
+        // Verificar
         assertTrue(updated?.isInLibrary ?: false)
         assertNotNull(updated?.dateAdded)
     }
 
     @Test
     fun removeFromLibrary_clearsLibraryData() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 300,
             title = "Remove Movie",
@@ -168,11 +168,11 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Act
+        // Actuar
         movieDao.removeFromLibrary(300)
         val updated = movieDao.getMovieById(300)
 
-        // Assert
+        // Verificar
         assertFalse(updated?.isInLibrary ?: true)
         assertNull(updated?.userRating)
         assertNull(updated?.userReview)
@@ -181,7 +181,7 @@ class MovieDaoTest {
 
     @Test
     fun isMovieInLibrary_returnsCorrectStatus() = runTest {
-        // Arrange
+        // Preparar
         val inLibraryMovie = Movie(
             id = 400,
             title = "In Library",
@@ -203,15 +203,15 @@ class MovieDaoTest {
 
         movieDao.insertMovies(listOf(inLibraryMovie, notInLibraryMovie))
 
-        // Act & Assert
+        // Actuar & Assert
         assertTrue(movieDao.isMovieInLibrary(400))
         assertFalse(movieDao.isMovieInLibrary(401))
-        assertFalse(movieDao.isMovieInLibrary(999)) // Non-existent movie
+        assertFalse(movieDao.isMovieInLibrary(999)) // Película inexistente
     }
 
     @Test
     fun getLibraryMovies_returnsOnlyLibraryMovies() = runTest {
-        // Arrange
+        // Preparar
         val movies = listOf(
             Movie(500, "Library 1", "In lib", "/l1.jpg", "2024-01-01", 8.0, isInLibrary = true),
             Movie(501, "Not in Library", "Not in lib", "/nl.jpg", "2024-02-01", 7.0, isInLibrary = false),
@@ -219,10 +219,10 @@ class MovieDaoTest {
         )
         movieDao.insertMovies(movies)
 
-        // Act
+        // Actuar
         val libraryMovies = movieDao.getLibraryMovies()
 
-        // Assert
+        // Verificar
         assertEquals(2, libraryMovies.size)
         assertTrue(libraryMovies.all { it.isInLibrary })
         assertTrue(libraryMovies.any { it.title == "Library 1" })
@@ -231,7 +231,7 @@ class MovieDaoTest {
 
     @Test
     fun getLibraryMoviesFlow_emitsUpdates() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 600,
             title = "Flow Movie",
@@ -243,21 +243,21 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Act
+        // Actuar
         val initialLibrary = movieDao.getLibraryMoviesFlow().first()
         assertEquals(0, initialLibrary.size)
 
         movieDao.addToLibrary(600)
         val updatedLibrary = movieDao.getLibraryMoviesFlow().first()
 
-        // Assert
+        // Verificar
         assertEquals(1, updatedLibrary.size)
         assertEquals("Flow Movie", updatedLibrary[0].title)
     }
 
     @Test
     fun getLibraryCount_returnsCorrectCount() = runTest {
-        // Arrange
+        // Preparar
         val movies = List(10) { index ->
             Movie(
                 id = 700 + index,
@@ -271,10 +271,10 @@ class MovieDaoTest {
         }
         movieDao.insertMovies(movies)
 
-        // Act
+        // Actuar
         val count = movieDao.getLibraryCount()
 
-        // Assert
+        // Verificar
         assertEquals(5, count)
     }
 
@@ -282,7 +282,7 @@ class MovieDaoTest {
 
     @Test
     fun updateUserRating_updatesRating() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 800,
             title = "Rating Movie",
@@ -294,17 +294,17 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Act
+        // Actuar
         movieDao.updateUserRating(800, 9.5f)
         val updated = movieDao.getMovieById(800)
 
-        // Assert
+        // Verificar
         assertEquals(9.5f, updated?.userRating ?: 0f, 0.01f)
     }
 
     @Test
     fun getAverageUserRating_calculatesCorrectly() = runTest {
-        // Arrange
+        // Preparar
         val movies = listOf(
             Movie(900, "Movie 1", "O", "/p.jpg", "2024-01-01", 7.0, userRating = 8.0f),
             Movie(901, "Movie 2", "O", "/p.jpg", "2024-01-01", 7.0, userRating = 6.0f),
@@ -313,10 +313,10 @@ class MovieDaoTest {
         )
         movieDao.insertMovies(movies)
 
-        // Act
+        // Actuar
         val average = movieDao.getAverageUserRating()
 
-        // Assert
+        // Verificar
         // Average of 8.0, 6.0, 10.0 = 24.0 / 3 = 8.0
         assertNotNull(average)
         assertEquals(8.0, average!!, 0.01)
@@ -324,7 +324,7 @@ class MovieDaoTest {
 
     @Test
     fun getAverageUserRating_withNoRatings_returnsNull() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 1000,
             title = "No Rating",
@@ -336,10 +336,10 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Act
+        // Actuar
         val average = movieDao.getAverageUserRating()
 
-        // Assert
+        // Verificar
         assertNull(average)
     }
 
@@ -347,7 +347,7 @@ class MovieDaoTest {
 
     @Test
     fun updateUserReview_updatesReview() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 1100,
             title = "Review Movie",
@@ -359,18 +359,18 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Act
+        // Actuar
         val review = "This is an excellent movie! Highly recommended."
         movieDao.updateUserReview(1100, review)
         val updated = movieDao.getMovieById(1100)
 
-        // Assert
+        // Verificar
         assertEquals(review, updated?.userReview)
     }
 
     @Test
     fun updateUserReview_withNull_clearsReview() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 1200,
             title = "Clear Review",
@@ -382,17 +382,17 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Act
+        // Actuar
         movieDao.updateUserReview(1200, null)
         val updated = movieDao.getMovieById(1200)
 
-        // Assert
+        // Verificar
         assertNull(updated?.userReview)
     }
 
     @Test
     fun getMoviesWithReviews_returnsOnlyReviewedMovies() = runTest {
-        // Arrange
+        // Preparar
         val movies = listOf(
             Movie(1300, "Reviewed 1", "O", "/p.jpg", "2024-01-01", 8.0, userReview = "Good"),
             Movie(1301, "No Review", "O", "/p.jpg", "2024-01-01", 7.0, userReview = null),
@@ -400,10 +400,10 @@ class MovieDaoTest {
         )
         movieDao.insertMovies(movies)
 
-        // Act
+        // Actuar
         val reviewedMovies = movieDao.getMoviesWithReviews()
 
-        // Assert
+        // Verificar
         assertEquals(2, reviewedMovies.size)
         assertTrue(reviewedMovies.all { it.userReview != null })
         assertTrue(reviewedMovies.any { it.title == "Reviewed 1" })
@@ -414,7 +414,7 @@ class MovieDaoTest {
 
     @Test
     fun movieLifecycle_addToLibrary_rate_review_remove() = runTest {
-        // Arrange
+        // Preparar
         val movie = Movie(
             id = 1400,
             title = "Lifecycle Movie",
@@ -425,7 +425,7 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Act & Assert - Initial state
+        // Actuar & Assert - Initial state
         val initial = movieDao.getMovieById(1400)
         assertFalse(initial?.isInLibrary ?: true)
         assertNull(initial?.userRating)
@@ -456,7 +456,7 @@ class MovieDaoTest {
 
     @Test
     fun emptyDatabase_queries_returnEmptyOrNull() = runTest {
-        // Act & Assert
+        // Actuar & Assert
         assertNull(movieDao.getMovieById(9999))
         assertEquals(0, movieDao.getLibraryMovies().size)
         assertEquals(0, movieDao.getLibraryCount())

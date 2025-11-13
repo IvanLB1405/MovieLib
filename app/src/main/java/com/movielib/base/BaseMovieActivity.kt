@@ -6,15 +6,15 @@ import com.movielib.movielib.repository.MovieRepository
 import com.movielib.movielib.utils.Constants
 
 /**
- * Base activity for all movie-related screens
+ * Activity base para todas las pantallas relacionadas con películas
  *
- * Provides shared functionality for all activities that need access to movie data:
- * - Lazy initialization of [MovieRepository] (created only when first accessed)
- * - Access to Room database via [MovieDatabase]
- * - Centralized repository management (DRY principle)
+ * Proporciona funcionalidad compartida para todas las activities que necesitan acceso a datos de películas:
+ * - Inicialización perezosa de [MovieRepository] (creado solo cuando se accede por primera vez)
+ * - Acceso a la base de datos Room mediante [MovieDatabase]
+ * - Gestión centralizada del repository (principio DRY)
  *
- * All activities that interact with movies should extend this class instead of
- * [AppCompatActivity] directly.
+ * Todas las activities que interactúan con películas deben extender esta clase en lugar de
+ * [AppCompatActivity] directamente.
  *
  * @see MovieRepository
  * @see MovieDatabase
@@ -22,12 +22,12 @@ import com.movielib.movielib.utils.Constants
 abstract class BaseMovieActivity : AppCompatActivity() {
 
     /**
-     * Movie repository instance shared across all activities
+     * Instancia del repositorio de películas compartida entre todas las activities
      *
-     * Lazily initialized to avoid creating unnecessary instances. Provides access to:
-     * - TMDb API operations
-     * - Local database (Room) operations
-     * - Library management functions
+     * Inicializada de forma perezosa para evitar crear instancias innecesarias. Proporciona acceso a:
+     * - Operaciones de la API de TMDb
+     * - Operaciones de base de datos local (Room)
+     * - Funciones de gestión de biblioteca
      */
     protected val repository: MovieRepository by lazy {
         val database = MovieDatabase.getDatabase(this)

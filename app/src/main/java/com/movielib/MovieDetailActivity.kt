@@ -18,16 +18,16 @@ import com.movielib.movielib.utils.Constants
 import kotlinx.coroutines.launch
 
 /**
- * Movie detail screen showing complete information about a specific movie
+ * Pantalla de detalles de película que muestra información completa sobre una película específica
  *
- * Features:
- * - Full movie details (title, rating, release date, genres, overview, cast)
- * - Backdrop and poster images
- * - Add/remove from personal library
- * - Rate and review movies (with RatingBar dialog)
- * - Preserves user data when updating from API
+ * Características:
+ * - Detalles completos de la película
+ * - Imágenes de fondo y póster
+ * - Añadir/eliminar de la biblioteca personal
+ * - Valorar y reseñar películas (con diálogo de RatingBar)
+ * - Preserva los datos del usuario al actualizar desde la API
  *
- * Receives movie ID via Intent extra: [SearchActivity.EXTRA_MOVIE_ID]
+ * Recibe el ID de la película mediante Intent extra: SearchActivity.EXTRA_MOVIE_ID
  *
  * @see BaseMovieActivity
  */
@@ -69,7 +69,7 @@ class MovieDetailActivity : BaseMovieActivity() {
             currentMovie?.let { movie -> toggleFavorite(movie) }
         }
 
-        // Both button and icon should do the same thing (DRY principle)
+        // Tanto el botón como el icono realizan la misma acción (principio DRY, no repetirse!!)
         binding.favoriteButton.setOnClickListener(favoriteClickListener)
         binding.favoriteIcon.setOnClickListener(favoriteClickListener)
 
@@ -132,7 +132,7 @@ class MovieDetailActivity : BaseMovieActivity() {
     }
 
     /**
-     * Helper function to set text or hide view if null/empty
+     * Función auxiliar para establecer texto u ocultar vista si es nulo/vacío
      */
     private fun setTextOrHide(text: String?, textView: android.widget.TextView) {
         if (!text.isNullOrEmpty()) {
@@ -153,7 +153,7 @@ class MovieDetailActivity : BaseMovieActivity() {
     }
 
     /**
-     * Helper function to load both backdrop and poster images (DRY principle)
+     * Función auxiliar para cargar imágenes de fondo y póster (principio DRY)
      */
     private fun loadMovieImages(posterPath: String?) {
         loadImageIntoView(

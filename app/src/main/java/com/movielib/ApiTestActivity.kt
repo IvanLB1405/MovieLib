@@ -8,15 +8,15 @@ import com.movielib.movielib.R
 import kotlinx.coroutines.launch
 
 /**
- * Test activity for verifying API and Repository functionality
- * For development and debugging purposes only
+ * Activity de prueba para verificar funcionalidad de API y Repository
+ * Solo para propósitos de desarrollo y depuración
  */
 class ApiTestActivity : BaseMovieActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Create simple layout to show tests are running
+        // Crear layout simple para mostrar que las pruebas están ejecutándose
         val textView = android.widget.TextView(this)
         textView.text = getString(R.string.api_test_message)
         textView.gravity = android.view.Gravity.CENTER
@@ -64,7 +64,7 @@ class ApiTestActivity : BaseMovieActivity() {
     }
 
     private suspend fun testLocalDatabase() {
-        // Test local database operations
+        // Probar operaciones de base de datos local
         repository.getLibraryMovies()
         repository.getLibraryStats()
     }

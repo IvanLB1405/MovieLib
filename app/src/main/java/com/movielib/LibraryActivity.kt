@@ -16,14 +16,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
- * Library screen displaying user's personal movie collection
+ * Pantalla de biblioteca que muestra la colección personal de películas del usuario
  *
- * Features:
- * - Statistics section (total movies, average rating, total reviews)
- * - Grid view of all movies in library
- * - Separate section for movies with reviews
- * - Empty state when library is empty
- * - Auto-refresh when returning from detail screen (onResume)
+ * Características:
+ * - Sección de estadísticas (total de películas, valoración promedio, total de reseñas)
+ * - Vista en cuadrícula de todas las películas en la biblioteca
+ * - Sección separada para películas con reseñas
+ * - Estado vacío cuando la biblioteca está vacía
+ * - Actualización automática al volver desde la pantalla de detalles (onResume)
  *
  * @see BaseMovieActivity
  * @see LibraryStats

@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
  *
  * ACTIVITY LIFECYCLE:
  * Una Activity pasa por varios estados desde que se crea hasta que se destruye:
- * onCreate() → onStart() → onResume() → [Running] → onPause() → onStop() → onDestroy()
+ * onCreate() → onStart() → onResume() → Running → onPause() → onStop() → onDestroy()
  *
  * CARACTERÍSTICAS:
  * - Sección hero con película destacada
@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
  * - Navegación a pantallas de búsqueda y biblioteca
  *
  * ARQUITECTURA:
- * - Extiende BaseMovieActivity para acceso al repository
+ * - Extiende BaseMovieActivity para acceso al repository que gestiona
  * - Usa ViewBinding para acceso type-safe a las vistas
  * - Usa Kotlin Coroutines para operaciones asíncronas
  * - Usa Flow para streams de datos reactivos
@@ -45,7 +45,7 @@ class MainActivity : BaseMovieActivity() {
      * ViewBinding que contiene referencias type-safe a todas las vistas del layout
      *
      * LATEINIT:
-     * - Promete que la variable será inicializada antes de usarse
+     * - Se asegura que la variable será inicializada antes de usarse
      * - Permite declarar variables no-nullable sin inicializarlas en el constructor
      * - Lanzará excepción si se usa antes de inicializar
      */
@@ -64,7 +64,7 @@ class MainActivity : BaseMovieActivity() {
     private lateinit var favoritesAdapter: MovieAdapter
 
     /**
-     * Primer método del lifecycle llamado cuando se crea la Activity
+     * Primer metodo del lifecycle llamado cuando se crea la Activity
      *
      * ONCREATE SE LLAMA:
      * - Primera vez que se lanza la Activity
@@ -79,10 +79,10 @@ class MainActivity : BaseMovieActivity() {
      * 5. Configurar la sección hero
      * 6. Cargar datos desde la API
      *
-     * @param savedInstanceState Estado guardado de la Activity (null si es primera vez)
+     * @param savedInstanceState Estado guardado de la Activity para optimizar (null si es primera vez)
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Llamar a la implementación de la clase padre PRIMERO (requerido)
+        // Llamar a la implementación de la clase padre PRIMERO
         super.onCreate(savedInstanceState)
 
         // Inflar el layout usando ViewBinding
@@ -93,7 +93,7 @@ class MainActivity : BaseMovieActivity() {
         // binding.root es el ViewGroup raíz del layout
         setContentView(binding.root)
 
-        // Configurar todos los componentes en orden lógico
+        // Configurar todos los componentes en orden
         setupRecyclerViews()
         setupClickListeners()
         setupHeroSection()
@@ -108,7 +108,7 @@ class MainActivity : BaseMovieActivity() {
      * - Al volver de onPause() (ej: volviendo de otra Activity)
      * - Al volver de onStop() vía onRestart() → onStart() → onResume()
      *
-     * USO TÍPICO:
+     * USO HABITUAL:
      * - Reanudar animaciones pausadas
      * - Refrescar datos que podrían haber cambiado
      * - Reiniciar listeners o sensores
@@ -134,14 +134,14 @@ class MainActivity : BaseMovieActivity() {
     }
 
     /**
-     * Helper function to create horizontal movie adapters (DRY principle)
+     * Función auxiliar para crear adaptadores de películas horizontales (principio DRY, no repetirse!!)
      */
     private fun createHorizontalAdapter() = MovieAdapter(MovieAdapter.LayoutType.HORIZONTAL) { movie ->
         navigateToMovieDetail(movie)
     }
 
     /**
-     * Helper function to setup horizontal RecyclerViews (DRY principle)
+     * Función auxiliar para preparar RecyclerViews horizontales
      */
     private fun setupRecyclerView(recyclerView: RecyclerView, adapter: MovieAdapter) {
         recyclerView.apply {
@@ -161,7 +161,7 @@ class MainActivity : BaseMovieActivity() {
     }
 
     private fun setupHeroSection() {
-        // Lambda to get movie ID from hero section
+        // Lambda para obtener el ID de la película desde la sección destacada
         val getHeroMovieId = { binding.heroSection.tag as? Int }
 
         binding.rateButton.setOnClickListener {
@@ -191,8 +191,7 @@ class MainActivity : BaseMovieActivity() {
      * Carga las películas populares desde el repository
      *
      * KOTLIN COROUTINES:
-     * Las coroutines son hilos ligeros de Kotlin para programación asíncrona.
-     * Permiten escribir código asíncrono de forma secuencial (sin callbacks anidados).
+     * Hilos ligeros de Kotlin
      *
      * LIFECYCLESCOPE:
      * - Scope ligado al lifecycle de la Activity
@@ -200,14 +199,14 @@ class MainActivity : BaseMovieActivity() {
      * - Evita memory leaks y crashes por usar Activities destruidas
      *
      * LAUNCH:
-     * - Inicia una nueva coroutine (no bloquea el thread principal)
+     * - Inicia una nueva coroutine (no bloquea el hilo principal)
      * - No retorna resultado (usa "fire and forget")
      * - Para retornar resultado se usa "async" + "await"
      *
      * FLOW:
-     * - Stream de datos asíncrono (como RxJava Observable o LiveData)
+     * - Stream de datos asíncrono (como RxJava Observable)
      * - Emite múltiples valores a lo largo del tiempo
-     * - Cold stream: no emite hasta que alguien lo "colecta"
+     * - Cold stream: no emite hasta que alguien lo "colecta", si no es un leak de datos constante
      *
      * COLLECT:
      * - Terminal operator que "consume" el Flow

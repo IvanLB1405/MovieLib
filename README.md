@@ -165,7 +165,7 @@ TMDB_API_KEY=tu_clave_aqui
 
 ### Características Adicionales
 
-- Sección hero con película destacada
+- Película destacada en portada con información ampliada (sinopsis y valoración)
 - Estadísticas de biblioteca (total, promedio, reseñas)
 - Caché automático con estrategia offline-first
 - Búsqueda con debounce (500ms)
@@ -226,32 +226,11 @@ El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en component
 - **[REQUIREMENTS.md](REQUIREMENTS.md)** - Requisitos funcionales del PFC
   - Todos los RF01-RF07
   - Estado del proyecto
-  - Roadmap futuro
 
 - **[movielib/README.md](movielib/README.md)** - Documentación específica de la librería
   - API pública
   - Instrucciones de integración
   - Ejemplos de uso
-
-### Generar PDF de la Documentación
-
-La documentación técnica puede convertirse a PDF usando varios métodos:
-
-**Método 1: VS Code con Extension** (Recomendado)
-1. Instalar [VS Code](https://code.visualstudio.com/)
-2. Instalar extension "Markdown PDF"
-3. Abrir `DOCUMENTACION_TECNICA.md`
-4. Click derecho → "Markdown PDF: Export (pdf)"
-
-**Método 2: Herramientas Online**
-- https://www.markdowntopdf.com/
-- https://cloudconvert.com/md-to-pdf
-
-**Método 3: Pandoc** (Requiere instalación)
-```bash
-sudo apt-get install pandoc texlive-latex-base texlive-latex-extra
-pandoc DOCUMENTACION_TECNICA.md -o DOCUMENTACION_TECNICA.pdf --toc
-```
 
 ---
 
@@ -297,14 +276,6 @@ pandoc DOCUMENTACION_TECNICA.md -o DOCUMENTACION_TECNICA.pdf --toc
 - Logging solo en builds debug
 - Permisos mínimos necesarios (INTERNET, ACCESS_NETWORK_STATE)
 - HTTPS obligatorio (usesCleartextTraffic=false)
-- ProGuard/R8 activado en release builds
-
-### Mejoras Planificadas v2.0
-
-- Certificate pinning para TMDb API
-- Backup cifrado de base de datos
-- Auditoría de seguridad completa
-- Ofuscación adicional de código
 
 ---
 
@@ -323,27 +294,6 @@ pandoc DOCUMENTACION_TECNICA.md -o DOCUMENTACION_TECNICA.pdf --toc
 **Cobertura de Tests**: Aproximadamente 88% en componentes críticos
 
 **Estado de Requisitos**: Todos los RF01-RF07 completados
-
----
-
-## Roadmap
-
-### Versión 2.0 (Planificada)
-
-- Implementar ViewModels (MVVM completo)
-- Inyección de dependencias con Hilt
-- Navigation Component
-- Room Migrations
-- Paginación con Paging 3
-- Tests de UI con Espresso
-
-### Versión 3.0 (Futura)
-
-- Jetpack Compose
-- Sincronización con cuenta de usuario
-- Recomendaciones personalizadas
-- Compartir reseñas en redes sociales
-- Modo offline completo
 
 ---
 

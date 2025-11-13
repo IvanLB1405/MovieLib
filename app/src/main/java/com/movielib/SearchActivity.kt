@@ -18,13 +18,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * Search screen activity for finding movies by text query
+ * Pantalla de búsqueda de películas por texto
  *
- * Features:
- * - Real-time search with debouncing (500ms delay)
- * - Grid layout for search results
- * - Empty, loading, no results, and success states
- * - Direct navigation to movie details
+ * Características:
+ * - Búsqueda en tiempo real con debouncing (retraso de 500ms)
+ * - Diseño en cuadrícula para los resultados de búsqueda
+ * - Estados: vacío, cargando, sin resultados y éxito
+ * - Navegación directa a detalles de película
  *
  * @see BaseMovieActivity
  */
@@ -150,7 +150,7 @@ class SearchActivity : BaseMovieActivity() {
     }
 
     /**
-     * Helper function to manage all view states in one place (DRY principle)
+     * Función auxiliar para gestionar todos los estados de vista en un solo lugar (principio DRY)
      */
     private fun setViewsVisibility(
         emptyState: Boolean,
