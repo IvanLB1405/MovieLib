@@ -304,15 +304,15 @@ Aplicación nativa Android que sirve como **plataforma de crítica de películas
 **Año Académico:** 2024-2025
 
 Para consultas sobre el proyecto:
-- Revisar DOCUMENTACION_TECNICA.md
+- Revisar DOCUMENTACION_TECNICA.pdf
 - Consultar README.md
-- Crear issue en el repositorio
 
 ---
 
 **Documento de Requisitos v1.0** - MovieLib Project
 **Fecha de Entrega:** 2025-11-11
 **Estado:** COMPLETADO
+
 
 
 
