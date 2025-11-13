@@ -218,7 +218,6 @@ El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en component
 - **[DOCUMENTACION_TECNICA.pdf](DOCUMENTACION_TECNICA.pdf)**
   - Arquitectura detallada
   - Explicación de todos los componentes
-  - Conceptos clave para desarrolladores junior
   - Patrones de diseño implementados
   - Guía de testing
   - Glosario técnico completo
@@ -339,4 +338,5 @@ Para preguntas, sugerencias o reportar problemas:
 ---
 
 **MovieLib v1.0** - Desarrollado con Kotlin y Android
+
 
