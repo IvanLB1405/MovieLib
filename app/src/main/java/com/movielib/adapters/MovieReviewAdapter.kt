@@ -22,8 +22,8 @@ import com.movielib.movielib.utils.Constants
  * VIEWBINDING:
  * Este adapter usa ViewBinding en lugar de findViewById():
  * - ViewBinding genera automáticamente una clase con referencias type-safe a todas las vistas
- * - Evita NullPointerException (tipo seguro en tiempo de compilación)
- * - Más eficiente y seguro que findViewById()
+ * - Evita NullPointerException
+ * - Más seguro que findViewById()
  *
  * @param onMovieClick Callback que se ejecuta cuando el usuario toca una película con reseña
  *
@@ -79,14 +79,14 @@ class MovieReviewAdapter(
             binding.titleTextView.text = movie.title
 
             // Mostrar el rating del usuario si existe
-            // let{} se ejecuta solo si userRating no es null (safe call)
+            // let{} se ejecuta solo si userRating no es null
             movie.userRating?.let { rating ->
                 // Formatear como "★ 8.5" con estrella unicode
                 binding.userRatingTextView.text = "★ ${String.format("%.1f", rating)}"
             }
 
             // Mostrar la reseña del usuario (o string vacío si es null)
-            // Usamos elvis operator ?: para proporcionar valor por defecto
+            // Usamos elvis operator ?: para dar valor por defecto
             binding.reviewTextView.text = movie.userReview ?: ""
 
             // Construir y cargar la URL del póster con Glide
@@ -102,7 +102,7 @@ class MovieReviewAdapter(
                 .error(R.drawable.placeholder_movie)
                 .into(binding.posterImageView)
 
-            // Configurar click listener en la vista raíz (todo el item es clickeable)
+            // Configurar click listener en la vista raíz (para que todo el item sea clickeable)
             // Como ReviewViewHolder es inner class, tiene acceso a onMovieClick de la clase externa
             binding.root.setOnClickListener {
                 onMovieClick(movie)
@@ -115,7 +115,6 @@ class MovieReviewAdapter(
      *
      * PRIVATE CLASS vs INNER CLASS:
      * Usamos "private class" aquí porque NO necesita acceso a la clase externa.
-     * Es más eficiente que inner class porque no mantiene una referencia a la clase externa.
      */
     private class MovieDiffCallback : DiffUtil.ItemCallback<Movie>() {
         override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
@@ -127,3 +126,4 @@ class MovieReviewAdapter(
         }
     }
 }
+
