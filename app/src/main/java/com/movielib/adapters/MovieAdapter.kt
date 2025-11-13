@@ -20,7 +20,7 @@ import com.movielib.movielib.utils.Constants
  * RECYCLERVIEW PATTERN:
  * RecyclerView es un componente de Android para mostrar listas eficientemente.
  * A diferencia de ListView antiguo, RecyclerView reutiliza las vistas (Views) en lugar
- * de crear una nueva para cada item, lo que mejora enormemente el rendimiento.
+ * de crear una nueva para cada item, lo que mejora el rendimiento.
  *
  * LISTADAPTER vs RECYCLERVIEW.ADAPTER:
  * ListAdapter extiende RecyclerView.Adapter y añade:
@@ -29,7 +29,7 @@ import com.movielib.movielib.utils.Constants
  * - No necesita notifyDataSetChanged() manual
  *
  * DIFFUTIL:
- * Calcula inteligentemente qué items cambiaron, se añadieron o eliminaron,
+ * Calcula qué items cambiaron, se añadieron o eliminaron,
  * y anima solo esos cambios en lugar de recrear toda la lista.
  *
  * @param layoutType Tipo de diseño a usar (horizontal para carruseles, grid para cuadrículas)
@@ -108,13 +108,13 @@ class MovieAdapter(
      * ViewHolder que contiene las vistas de un item de película
      *
      * PATRÓN VIEWHOLDER:
-     * ViewHolder es un patrón que cachea las referencias a las vistas de un item.
-     * Sin ViewHolder, findViewById() se llamaría en cada bind(), lo cual es LENTO.
+     * ViewHolder cachea las referencias a las vistas de un item.
+     * Sin ViewHolder, findViewById() se llamaría en cada bind(), lo cual es MUY LENTO.
      *
      * VENTAJAS:
      * - findViewById() se llama solo una vez (en el constructor)
      * - Las referencias se reutilizan cuando se recicla la vista
-     * - Mejora drásticamente el rendimiento del scroll
+     * - Mejora el rendimiento del scroll
      *
      * @param itemView Vista raíz del layout de un item individual
      */
@@ -138,17 +138,17 @@ class MovieAdapter(
             // Establecer el título de la película
             movieTitle.text = movie.title
 
-            // Formatear y mostrar la puntuación con 1 decimal (ej: "7.8")
+            // Formatear y mostrar la puntuación con 1 decimal
             movieRating.text = String.format("%.1f", movie.voteAverage)
 
             // Construir URL completa del póster combinando base URL + tamaño + path
             val posterUrl = Constants.buildPosterUrl(
-                movie.posterPath,    // Path relativo de TMDb (ej: "/abc123.jpg")
+                movie.posterPath,    // Path relativo de TMDb
                 Constants.IMAGE_SIZE_W342  // Tamaño de imagen (342px de ancho)
             )
 
             // GLIDE: Librería de carga de imágenes con características avanzadas:
-            // - Caché automática (memoria y disco)
+            // - Caché automática (memoria)
             // - Redimensionamiento automático
             // - Placeholders mientras carga
             // - Manejo de errores
@@ -160,7 +160,7 @@ class MovieAdapter(
                 .into(moviePoster)  // ImageView destino
 
             // Mostrar u ocultar el indicador de favorito según si está en biblioteca
-            // Usamos visibilidad condicional con expresión if
+            // Usamos visibilidad condicional con un if
             favoriteIndicator.visibility = if (movie.isInLibrary) View.VISIBLE else View.GONE
 
             // Configurar listener para detectar clicks en todo el item
@@ -175,14 +175,14 @@ class MovieAdapter(
      * Callback para calcular diferencias entre dos listas de películas
      *
      * DIFFUTIL:
-     * DiffUtil es un algoritmo de Android que calcula eficientemente las diferencias
+     * DiffUtil algoritmo que calcula eficientemente las diferencias
      * entre dos listas y genera el set mínimo de operaciones para actualizar una lista a otra.
      *
      * VENTAJAS sobre notifyDataSetChanged():
-     * - Solo actualiza items que realmente cambiaron (más eficiente)
+     * - Solo actualiza items que realmente cambiaron
      * - Anima automáticamente los cambios (añadir/eliminar/mover)
-     * - Mejor experiencia de usuario (no hay parpadeos)
-     * - Mejor rendimiento (especialmente en listas grandes)
+     * - Evita parpadeos de pantalla
+     * - Mejor rendimiento con listas grandes
      *
      * FUNCIONAMIENTO:
      * 1. submitList() recibe una nueva lista
@@ -195,7 +195,7 @@ class MovieAdapter(
          * Determina si dos items representan la misma entidad
          *
          * Esto NO verifica si el contenido es igual, solo si representan
-         * el mismo objeto (misma película). Se usa el ID único para esto.
+         * el mismo objeto (misma movie). Se usa el ID único.
          *
          * EJEMPLO:
          * - Movie(id=1, title="Inception", rating=8.0) vs
@@ -229,3 +229,4 @@ class MovieAdapter(
         }
     }
 }
+
