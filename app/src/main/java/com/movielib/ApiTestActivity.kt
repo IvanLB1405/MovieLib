@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Activity de prueba para verificar funcionalidad de API y Repository
- * Solo para propósitos de desarrollo y depuración
+ * Solo para desarrollo y depuración
  */
 class ApiTestActivity : BaseMovieActivity() {
 
@@ -68,4 +68,5 @@ class ApiTestActivity : BaseMovieActivity() {
         repository.getLibraryMovies()
         repository.getLibraryStats()
     }
+
 }
