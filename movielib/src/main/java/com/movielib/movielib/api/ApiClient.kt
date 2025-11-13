@@ -10,12 +10,10 @@ import java.util.concurrent.TimeUnit
 /**
  * Cliente Retrofit para manejar las peticiones HTTP a la API de TMDb
  *
- * Implementa patrón Singleton para reutilizar la instancia de Retrofit y optimizar recursos.
- * Configura automáticamente timeouts, logging (solo en debug) y conversión JSON con Gson.
+ * Patrón Singleton para reutilizar la instancia de Retrofit y optimizar.
+ * Configura automáticamente timeouts y conversión JSON con Gson.
  *
  * Características:
- * - Logging HTTP solo en modo DEBUG para seguridad
- * - Timeout configurable de 30 segundos
  * - Conversión automática JSON con Gson
  * - Reutilización de conexiones HTTP
  *
@@ -50,7 +48,7 @@ object ApiClient {
      * Obtiene la instancia de Retrofit (Singleton)
      *
      * Crea la instancia de Retrofit solo en la primera llamada. Las llamadas
-     * posteriores reutilizan la misma instancia para optimizar recursos.
+     * posteriores reutilizan la misma instancia para optimizar.
      *
      * @return Instancia configurada de Retrofit con OkHttpClient y Gson
      */
@@ -82,9 +80,10 @@ object ApiClient {
      * Limpia la instancia de Retrofit para forzar recreación
      *
      * Útil principalmente para testing cuando se necesita reiniciar el estado
-     * del cliente HTTP. NO debería usarse en código de producción.
+     * del cliente HTTP. Si se implementa la libreria no deberia usarse en produccion.
      */
     fun clearInstance() {
         retrofit = null
     }
+
 }
