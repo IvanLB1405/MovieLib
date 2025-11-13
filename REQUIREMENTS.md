@@ -244,7 +244,7 @@ Aplicación nativa Android que sirve como **plataforma de crítica de películas
 - Dialogs personalizados para rating y review
 - Flow reactivo para actualizaciones en tiempo real
 - Preservación de datos de usuario al actualizar desde API
-- Manejo robusto de estados y errores
+- Manejo estados y errores
 - Navegación fluida entre pantallas
 
 ---
@@ -313,6 +313,7 @@ Para consultas sobre el proyecto:
 **Documento de Requisitos v1.0** - MovieLib Project
 **Fecha de Entrega:** 2025-11-11
 **Estado:** COMPLETADO
+
 
 
 
