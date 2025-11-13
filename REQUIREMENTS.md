@@ -323,10 +323,6 @@ Aplicación nativa Android que sirve como **plataforma de crítica de películas
 - Database: ~90%
 - Total Crítico: ~88%
 
-**Tiempo de Desarrollo:**
-- Versión 1.0: ~80 horas
-- Documentación: ~15 horas
-- Testing: ~20 horas
 
 ---
 
@@ -348,3 +344,4 @@ Para consultas sobre el proyecto:
 **Documento de Requisitos v1.0** - MovieLib Project
 **Fecha de Entrega:** 2025-11-11
 **Estado:** COMPLETADO
+
