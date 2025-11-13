@@ -305,12 +305,6 @@ El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en component
 ```
 ---
 
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
-
----
-
 ## Autor
 
 **Iván Fernández González**
@@ -336,6 +330,7 @@ Para preguntas, sugerencias o reportar problemas:
 ---
 
 **MovieLib v1.0** - Desarrollado con Kotlin y Android
+
 
 
 
