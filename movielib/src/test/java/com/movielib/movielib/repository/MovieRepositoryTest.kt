@@ -35,7 +35,7 @@ class MovieRepositoryTest {
         unmockkAll()
     }
 
-    // ===== Tests de Películas en Biblioteca =====
+    // Tests de Películas en Biblioteca
 
     @Test
     fun `getLibraryMoviesFlow returns flow from DAO`() = runTest {
@@ -108,7 +108,7 @@ class MovieRepositoryTest {
         coVerify(exactly = 1) { movieDao.getMoviesWithReviews() }
     }
 
-    // ===== Tests de Estadísticas de Biblioteca =====
+    // Tests de Estadísticas de Biblioteca
 
     @Test
     fun `getLibraryStats returns correct statistics`() = runTest {
@@ -166,7 +166,7 @@ class MovieRepositoryTest {
         assertEquals(0, stats.moviesWithReviews)
     }
 
-    // ===== Tests de Clase de Datos LibraryStats =====
+    // Tests de Clase de Datos LibraryStats
 
     @Test
     fun `LibraryStats data class holds correct values`() {
@@ -226,7 +226,7 @@ class MovieRepositoryTest {
         coVerify(exactly = 1) { movieDao.isMovieInLibrary(movieId) }
     }
 
-    // ===== Tests de Comportamiento de Flow =====
+    // Tests de Comportamiento de Flow 
 
     @Test
     fun `getLibraryMoviesFlow emits multiple values`() = runTest {
@@ -266,3 +266,4 @@ class MovieRepositoryTest {
         }
     }
 }
+
