@@ -49,7 +49,7 @@ El proyecto sigue Clean Architecture con tres capas principales:
                  ▼
 ┌─────────────────────────────────────┐
 │   CAPA DE DOMINIO (Business Logic)  │
-│  MovieRepository • ApiResponse       │
+│  MovieRepository • ApiResponse      │
 └────────────────┬────────────────────┘
                  │
        ┌─────────┴──────────┐
@@ -173,13 +173,13 @@ TMDB_API_KEY=tu_clave_aqui
 - Dialogs personalizados para rating/review
 - Flow reactivo para actualizaciones en tiempo real
 - Navegación fluida entre pantallas
-- Manejo robusto de estados (Loading, Success, Error, NetworkError)
+- Manejo de estados (Loading, Success, Error, NetworkError)
 
 ---
 
 ## Testing
 
-El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en componentes críticos:
+El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en componentes:
 
 ```bash
 # Tests unitarios
@@ -279,9 +279,7 @@ El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en component
 
 ## Estado del Proyecto
 
-**Versión Actual**: 1.0 -
-
-**Cobertura de Tests**: Aproximadamente 88% en componentes críticos
+**Versión Actual**: 1.0
 
 ---
 
@@ -338,5 +336,6 @@ Para preguntas, sugerencias o reportar problemas:
 ---
 
 **MovieLib v1.0** - Desarrollado con Kotlin y Android
+
 
 
