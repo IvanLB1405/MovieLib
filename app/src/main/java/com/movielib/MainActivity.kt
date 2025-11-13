@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
  * Pantalla principal que muestra películas populares, mejor valoradas y biblioteca del usuario
  *
  * ACTIVITY LIFECYCLE:
- * Una Activity pasa por varios estados desde que se crea hasta que se destruye:
+ * Cualquier Activity pasa por varios estados desde que se crea hasta que se destruye:
  * onCreate() → onStart() → onResume() → Running → onPause() → onStop() → onDestroy()
  *
  * CARACTERÍSTICAS:
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
  *
  * ARQUITECTURA:
  * - Extiende BaseMovieActivity para acceso al repository que gestiona
- * - Usa ViewBinding para acceso type-safe a las vistas
+ * - Usa ViewBinding para acceso a las vistas
  * - Usa Kotlin Coroutines para operaciones asíncronas
  * - Usa Flow para streams de datos reactivos
  *
@@ -86,7 +86,7 @@ class MainActivity : BaseMovieActivity() {
         super.onCreate(savedInstanceState)
 
         // Inflar el layout usando ViewBinding
-        // layoutInflater es proporcionado por Activity para convertir XML en Views
+        // layoutInflater viene de Activity para convertir XML en Views
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         // Establecer el layout como contenido de esta Activity
@@ -196,22 +196,22 @@ class MainActivity : BaseMovieActivity() {
      * LIFECYCLESCOPE:
      * - Scope ligado al lifecycle de la Activity
      * - Cancela automáticamente las coroutines cuando la Activity se destruye
-     * - Evita memory leaks y crashes por usar Activities destruidas
+     * - Evita fugas de memoria y crasheos por usar Activities destruidas
      *
      * LAUNCH:
      * - Inicia una nueva coroutine (no bloquea el hilo principal)
-     * - No retorna resultado (usa "fire and forget")
+     * - No retorna resultado
      * - Para retornar resultado se usa "async" + "await"
      *
      * FLOW:
      * - Stream de datos asíncrono (como RxJava Observable)
      * - Emite múltiples valores a lo largo del tiempo
-     * - Cold stream: no emite hasta que alguien lo "colecta", si no es un leak de datos constante
+     * - Flujo frio: no emite hasta que alguien lo pide, si no, seria un leak de datos constante
      *
      * COLLECT:
      * - Terminal operator que "consume" el Flow
      * - Función suspendible que recibe cada valor emitido
-     * - Se ejecuta en el contexto de la coroutine (thread seguro)
+     * - Se ejecuta solo en el contexto de la coroutine (thread seguro)
      *
      * FLUJO DE EJECUCIÓN:
      * 1. lifecycleScope.launch{} crea una coroutine ligada a la Activity
