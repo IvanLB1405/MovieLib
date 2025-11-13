@@ -9,14 +9,14 @@ A comprehensive Android library for movie discovery and management, integrating 
 
 ## Features
 
-- 🎬 **TMDb Integration** - Search movies, browse popular/top-rated lists, get detailed information
-- 💾 **Local Caching** - Room database for offline access and performance
-- 📚 **Personal Library** - Users can build their own movie collection
-- ⭐ **Ratings & Reviews** - Add personal ratings and reviews to movies
-- 🔄 **Reactive Data** - Kotlin Flow for real-time UI updates
-- 🖼️ **Image Loading** - Glide integration for efficient poster/backdrop images
-- 🧪 **Well Tested** - 36+ unit and instrumented tests
-- 📖 **Documented** - Complete KDoc documentation for all public APIs
+- **TMDb Integration** - Search movies, browse popular/top-rated lists, get detailed information
+- **Local Caching** - Room database for offline access and performance
+- **Personal Library** - Users can build their own movie collection
+- **Ratings & Reviews** - Add personal ratings and reviews to movies
+- **Reactive Data** - Kotlin Flow for real-time UI updates
+- **Image Loading** - Glide integration for efficient poster/backdrop images
+- **Well Tested** - 36+ unit and instrumented tests
+- **Documented** - KDoc documentation for all public APIs
 
 ## Table of Contents
 
@@ -153,7 +153,7 @@ sealed class ApiResponse<out T> {
 }
 ```
 
-#### 2. **MovieRepository** (Single Source of Truth)
+#### 2. **MovieRepository**
 
 Coordinates between remote API and local database:
 
@@ -504,7 +504,7 @@ androidTestImplementation("androidx.room:room-testing:2.6.1")
 
 ## Testing
 
-The library includes comprehensive test coverage:
+The library includes test coverage:
 
 - **Unit Tests:** `movielib/src/test/`
   - ApiResponse tests
@@ -531,18 +531,16 @@ Run tests:
 
 ### Security Features
 
-- ✅ API key stored in `BuildConfig` (not hardcoded)
-- ✅ ProGuard/R8 rules included for release builds
-- ✅ Cleartext traffic disabled in release
-- ✅ Logging interceptor only in debug builds
+- API key stored in `BuildConfig` (not hardcoded)
+- Cleartext traffic disabled in release
 
 ### Performance Optimizations
 
-- ✅ Smart caching with Room database
-- ✅ Offline-first strategy for movie details
-- ✅ Efficient image loading with Glide
-- ✅ Kotlin Flow for reactive updates
-- ✅ Lazy repository initialization
+- Smart caching with Room database
+- Offline-first strategy for movie details
+- Efficient image loading with Glide
+- Kotlin Flow for reactive updates
+- Lazy repository initialization
 
 ## Best Practices
 
@@ -603,47 +601,10 @@ repository.getLibraryMoviesFlow().collectLatest { movies ->
 
 **Solution:** Ensure Glide dependency is added and internet permission is granted.
 
-### Issue: Database migration error
-
-**Solution:** The library uses `fallbackToDestructiveMigration()`. For production, implement proper migrations.
-
 ## Contributing
 
 This library was developed as part of a Final Year Project (PFC) for DAM 2º (Desarrollo de Aplicaciones Multiplataforma).
 
-## License
-
-```
-MIT License
-
-Copyright (c) 2025 MovieLib
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
 ## Resources
 
-- [TMDb API Documentation](https://developers.themoviedb.org/3)
-- [Android Room Database](https://developer.android.com/training/data-storage/room)
-- [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
-- [Retrofit](https://square.github.io/retrofit/)
-
 ---
-
-**Made with ❤️ for Android developers**
