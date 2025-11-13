@@ -47,8 +47,8 @@ class MovieRepository(
      * Realiza una búsqueda en la API de TMDb y cachea automáticamente los resultados
      * en la base de datos local. Emite estados Loading, Success, Error o NetworkError.
      *
-     * @param query Término de búsqueda (ej: "Inception", "Matrix")
-     * @param page Número de página (por defecto 1)
+     * @param query Término de búsqueda 
+     * @param page Número de página 
      * @return Flow que emite estados de la operación con lista de películas
      *
      * @see ApiResponse
@@ -92,7 +92,7 @@ class MovieRepository(
      * Obtiene las películas más populares de TMDb
      *
      * Consulta las películas actualmente populares en TMDb y las cachea localmente.
-     * Útil para mostrar contenido destacado en la pantalla principal.
+     * Sirve para mostrar contenido destacado en la pantalla principal.
      *
      * @param page Número de página (por defecto 1)
      * @return Flow con lista de películas populares
@@ -159,7 +159,6 @@ class MovieRepository(
     /**
      * Obtiene los detalles completos de una película
      *
-     * Implementa estrategia de caché inteligente:
      * 1. Primero verifica la caché local
      * 2. Si existe localmente, emite los datos y luego actualiza desde la API
      * 3. Si hay error de red, devuelve datos cacheados si existen
@@ -232,8 +231,8 @@ class MovieRepository(
     /**
      * Obtiene un Flow reactivo de las películas en la biblioteca personal
      *
-     * Este Flow se actualiza automáticamente cuando cambia el contenido de la biblioteca.
-     * Útil para observar cambios en tiempo real en la UI.
+     * Se actualiza automáticamente cuando cambia el contenido de la biblioteca.
+     * Sirve para observar cambios en tiempo real en la UI.
      *
      * @return Flow que emite la lista actualizada de películas en biblioteca
      */
@@ -242,7 +241,7 @@ class MovieRepository(
     }
 
     /**
-     * Obtiene la lista actual de películas en la biblioteca (operación única)
+     * Obtiene la lista actual de películas en la biblioteca
      *
      * @return Lista de películas en la biblioteca del usuario
      */
@@ -277,7 +276,7 @@ class MovieRepository(
     /**
      * Elimina una película de la biblioteca personal del usuario
      *
-     * NOTA: Esto también borra la valoración y reseña del usuario para esta película.
+     * También borra la valoración y reseña del usuario para esta película.
      *
      * @param movieId ID de la película a eliminar
      * @return true si se eliminó correctamente, false en caso de error
@@ -359,4 +358,5 @@ data class LibraryStats(
     val totalMovies: Int,
     val averageRating: Double,
     val moviesWithReviews: Int
+
 )
