@@ -8,10 +8,10 @@ import com.movielib.movielib.utils.Constants
 /**
  * Activity base para todas las pantallas relacionadas con películas
  *
- * Proporciona funcionalidad compartida para todas las activities que necesitan acceso a datos de películas:
+ *  Funcionalidad compartida para todas las activities que necesitan acceso a datos de películas:
  * - Inicialización perezosa de [MovieRepository] (creado solo cuando se accede por primera vez)
  * - Acceso a la base de datos Room mediante [MovieDatabase]
- * - Gestión centralizada del repository (principio DRY)
+ * - Gestión centralizada del repository para evitar repetirnos
  *
  * Todas las activities que interactúan con películas deben extender esta clase en lugar de
  * [AppCompatActivity] directamente.
@@ -24,7 +24,7 @@ abstract class BaseMovieActivity : AppCompatActivity() {
     /**
      * Instancia del repositorio de películas compartida entre todas las activities
      *
-     * Inicializada de forma perezosa para evitar crear instancias innecesarias. Proporciona acceso a:
+     * Inicializada en lazy para evitar crear instancias innecesarias. Proporciona acceso a:
      * - Operaciones de la API de TMDb
      * - Operaciones de base de datos local (Room)
      * - Funciones de gestión de biblioteca
@@ -34,3 +34,4 @@ abstract class BaseMovieActivity : AppCompatActivity() {
         MovieRepository(database.movieDao(), Constants.TMDB_API_KEY)
     }
 }
+
