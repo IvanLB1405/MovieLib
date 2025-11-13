@@ -4,13 +4,6 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!--
-        Este es el 'foreground' (primer plano) del icono adaptativo.
-        El diseño es un ticket/marcador (MovieLib) con un símbolo de 'Play'
-        recortado (MovieCritique)
-        La geometría está optimizada para el viewport 108x108.
-    -->
     <path
         android:fillColor="#F4A261"
         android:pathData="M32 34 H76 V80 L54 69 L32 80 Z M49 49 L60 54 L49 60 Z"
