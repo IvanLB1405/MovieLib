@@ -273,32 +273,6 @@ Aplicación nativa Android que sirve como **plataforma de crítica de películas
 
 ---
 
-## Entregables
-
-### 1. Código Fuente
-- Librería :movielib (Android Library Module)
-- Aplicación demo :app (Android Application)
-- Estructura multi-módulo con Gradle
-
-### 2. Documentación
-- README.md: Instrucciones de instalación y uso
-- REQUIREMENTS.md: Este documento con requisitos completos
-- DOCUMENTACION_TECNICA.md: Documentación exhaustiva
-- KDoc: En clases y métodos públicos de la librería
-- movielib/README.md: Guía de integración de la librería
-
-### 3. Testing
-- 56+ tests automatizados
-- Cobertura ~88% en componentes críticos
-- Tests unitarios y de integración
-
-### 4. Control de Versiones
-- Repositorio Git con historial completo
-- Commits descriptivos y organizados
-- .gitignore configurado correctamente
-
----
-
 ## Métricas del Proyecto
 
 **Líneas de Código:**
@@ -339,5 +313,6 @@ Para consultas sobre el proyecto:
 **Documento de Requisitos v1.0** - MovieLib Project
 **Fecha de Entrega:** 2025-11-11
 **Estado:** COMPLETADO
+
 
 
