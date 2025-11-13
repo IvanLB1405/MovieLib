@@ -3,14 +3,14 @@ package com.movielib.movielib.api
 /**
  * Clase sellada para manejar diferentes estados de respuesta de la API
  *
- * @param T Tipo de datos que contiene la respuesta exitosa
+ * @param T Tipo de datos que contiene la respuesta y es solo de salida
  */
 sealed class ApiResponse<out T> {
 
     /**
      * Respuesta exitosa
      *
-     * @param data Datos obtenidos de la API
+     * @param Datos obtenidos de la API
      */
     data class Success<T>(val data: T) : ApiResponse<T>()
 
@@ -60,4 +60,5 @@ fun <T> ApiResponse<T>.getDataOrNull(): T? {
  */
 fun <T> ApiResponse<T>.getErrorMessage(): String? {
     return if (this is ApiResponse.Error) this.message else null
+
 }
