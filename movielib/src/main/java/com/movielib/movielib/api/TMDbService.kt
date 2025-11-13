@@ -14,9 +14,6 @@ import retrofit2.http.Query
  * obtener detalles, listas populares y mejor valoradas. Todas las funciones son
  * suspendibles para uso con Kotlin Coroutines.
  *
- * Documentación oficial de la API: https://developers.themoviedb.org/3
- * Base URL: https://api.themoviedb.org/3/
- *
  * @see ApiClient
  * @see MovieRepository
  */
@@ -108,7 +105,7 @@ interface TMDbService {
         const val POSTER_SIZE_ORIGINAL = "original"
 
         /**
-         * Construir URL completa para imágenes de pósters
+         * Construir URL completa para imágenes tipo pósters
          *
          * @param posterPath Ruta del póster (viene de la API)
          * @param size Tamaño deseado (w500 por defecto)
@@ -122,4 +119,5 @@ interface TMDbService {
             }
         }
     }
+
 }
