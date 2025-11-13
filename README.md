@@ -215,7 +215,7 @@ El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en component
 
 ### Documentación Disponible
 
-- **[DOCUMENTACION_TECNICA.md](DOCUMENTACION_TECNICA.md)** - Documentación técnica completa (60 páginas)
+- **[DOCUMENTACION_TECNICA.pdf](DOCUMENTACION_TECNICA.pdf)**
   - Arquitectura detallada
   - Explicación de todos los componentes
   - Conceptos clave para desarrolladores junior
@@ -273,7 +273,6 @@ El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en component
 
 - API key en BuildConfig (no en código fuente)
 - `local.properties` en `.gitignore`
-- Logging solo en builds debug
 - Permisos mínimos necesarios (INTERNET, ACCESS_NETWORK_STATE)
 - HTTPS obligatorio (usesCleartextTraffic=false)
 
@@ -281,19 +280,9 @@ El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en component
 
 ## Estado del Proyecto
 
-**Versión Actual**: 1.0 - Production Ready
-
-**Calidad de Código**:
-- Clean Architecture implementada
-- Patrones de diseño aplicados correctamente
-- Testing completo (56+ tests)
-- Documentación profesional y exhaustiva
-- Código limpio sin deuda técnica crítica
-- KDoc en clases principales
+**Versión Actual**: 1.0 -
 
 **Cobertura de Tests**: Aproximadamente 88% en componentes críticos
-
-**Estado de Requisitos**: Todos los RF01-RF07 completados
 
 ---
 
@@ -317,20 +306,6 @@ El proyecto incluye 56+ tests con cobertura del aproximadamente 88% en component
 # Ver estructura del proyecto
 ./gradlew projects
 ```
-
-### Estructura de Commits
-
-El proyecto sigue un historial de commits descriptivo:
-
-```
-git log --oneline
-649800c Version 1.0 casi entregable
-355c782 Cambios para completar version 1.0 entregable
-c2ae348 Añadida docu formato KDOC, mejoras en seguridad y refactorizacion de codigo
-7101ebd Mejoras en la legibilidad del codigo. Cambio Strings y refactorizacion/eliminacion de cosas inutiles
-5d5a115 Añadido icono de escritorio, cambio de colortheme y añadir funcionalidad a la biblioteca
-```
-
 ---
 
 ## Licencia
@@ -344,24 +319,24 @@ Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE)
 **Iván Fernández González**
 - **Centro**: CIFP Avilés
 - **Ciclo**: DAM 2º (Modalidad Distancia)
-- **Proyecto**: Final de Ciclo 2024-2025
 
 ---
 
 ## Agradecimientos
 
-- [The Movie Database (TMDb)](https://www.themoviedb.org/) por proporcionar la API gratuita
+- [The Movie Database (TMDb)](https://www.themoviedb.org/) (API gratuita)
 - Comunidad de Android Developers
 - Documentación oficial de Android y Kotlin
+- DevDocs
 
 ---
 
 ## Contacto y Soporte
 
 Para preguntas, sugerencias o reportar problemas:
-- Crear un issue en el repositorio
 - Consultar la [documentación técnica completa](DOCUMENTACION_TECNICA.md)
 
 ---
 
 **MovieLib v1.0** - Desarrollado con Kotlin y Android
+
