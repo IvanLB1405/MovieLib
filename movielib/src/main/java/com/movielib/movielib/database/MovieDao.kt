@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MovieDao {
 
-    // ============ OPERACIONES BÁSICAS ============
+    // OPERACIONES BÁSICAS
 
     /**
      * Inserta una película en la base de datos
@@ -55,7 +55,7 @@ interface MovieDao {
     @Delete
     suspend fun deleteMovie(movie: Movie)
 
-    // ============ CONSULTAS DE BÚSQUEDA ============
+    // CONSULTAS DE BÚSQUEDA
 
     /**
      * Obtiene todas las películas almacenadas en la base de datos
@@ -83,12 +83,12 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE title LIKE '%' || :query || '%'")
     suspend fun searchMoviesByTitle(query: String): List<Movie>
 
-    // ============ BIBLIOTECA PERSONAL ============
+    // BIBLIOTECA PERSONAL 
 
     /**
      * Obtiene películas de la biblioteca como Flow reactivo
      *
-     * El Flow emite automáticamente cuando cambia la biblioteca, ideal para observar
+     * El Flow emite automáticamente cuando cambia la biblioteca, podemos ver
      * cambios en tiempo real en la UI.
      *
      * @return Flow que emite lista actualizada ordenada por fecha de añadido (más recientes primero)
@@ -97,7 +97,7 @@ interface MovieDao {
     fun getLibraryMoviesFlow(): Flow<List<Movie>>
 
     /**
-     * Obtiene todas las películas de la biblioteca personal (operación única)
+     * Obtiene todas las películas de la biblioteca personal
      *
      * @return Lista de películas en biblioteca ordenadas por fecha de añadido
      */
@@ -134,7 +134,7 @@ interface MovieDao {
     @Query("UPDATE movies SET isInLibrary = 0, dateAdded = NULL, userRating = NULL, userReview = NULL WHERE id = :movieId")
     suspend fun removeFromLibrary(movieId: Int)
 
-    // ============ RESEÑAS Y PUNTUACIONES ============
+    // RESEÑAS Y PUNTUACIONES
 
     /**
      * Actualiza la puntuación del usuario para una película
@@ -170,7 +170,7 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE isInLibrary = 1 AND userRating IS NOT NULL ORDER BY userRating DESC")
     suspend fun getRatedMovies(): List<Movie>
 
-    // ============ ESTADÍSTICAS ============
+    // ESTADÍSTICAS 
 
     /**
      * Cuenta el total de películas en la biblioteca personal
@@ -188,14 +188,15 @@ interface MovieDao {
     @Query("SELECT AVG(userRating) FROM movies WHERE isInLibrary = 1 AND userRating IS NOT NULL")
     suspend fun getAverageUserRating(): Double?
 
-    // ============ LIMPIEZA ============
+    // LIMPIEZA 
 
     /**
-     * Elimina películas que no están en la biblioteca (limpieza de caché)
+     * Elimina películas que no están en la biblioteca (limpia caché)
      *
      * Útil para liberar espacio eliminando películas que solo se guardaron temporalmente
      * como caché de búsquedas o listas populares.
      */
     @Query("DELETE FROM movies WHERE isInLibrary = 0")
     suspend fun clearNonLibraryMovies()
+
 }
