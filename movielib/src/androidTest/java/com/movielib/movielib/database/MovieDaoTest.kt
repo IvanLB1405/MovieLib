@@ -15,9 +15,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Tests instrumentados para MovieDao
+ * Tests para MovieDao
  *
- * Estos tests requieren un contexto de Android y se ejecutan en un dispositivo/emulador
+ * Estos tests requieren un contexto de Android y se ejecutan en un dispositivo o emulador
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -42,7 +42,7 @@ class MovieDaoTest {
         database.close()
     }
 
-    // ===== Tests de Inserción =====
+    //Tests de Inserción
 
     @Test
     fun insertMovie_andGetById_returnsCorrectMovie() = runTest {
@@ -126,7 +126,7 @@ class MovieDaoTest {
         assertEquals(9.0, afterUpdate?.voteAverage ?: 0.0, 0.001)
     }
 
-    // ===== Tests de Operaciones de Biblioteca =====
+    //Tests de Operaciones de Biblioteca
 
     @Test
     fun addToLibrary_setsIsInLibraryToTrue() = runTest {
@@ -266,7 +266,7 @@ class MovieDaoTest {
                 posterPath = "/p.jpg",
                 releaseDate = "2024-01-01",
                 voteAverage = 7.0,
-                isInLibrary = index < 5 // Only first 5 in library
+                isInLibrary = index < 5
             )
         }
         movieDao.insertMovies(movies)
@@ -278,7 +278,7 @@ class MovieDaoTest {
         assertEquals(5, count)
     }
 
-    // ===== User Rating Tests =====
+    // User Rating Tests
 
     @Test
     fun updateUserRating_updatesRating() = runTest {
@@ -317,7 +317,6 @@ class MovieDaoTest {
         val average = movieDao.getAverageUserRating()
 
         // Verificar
-        // Average of 8.0, 6.0, 10.0 = 24.0 / 3 = 8.0
         assertNotNull(average)
         assertEquals(8.0, average!!, 0.01)
     }
@@ -343,7 +342,7 @@ class MovieDaoTest {
         assertNull(average)
     }
 
-    // ===== User Review Tests =====
+    // User Review Tests
 
     @Test
     fun updateUserReview_updatesReview() = runTest {
@@ -410,7 +409,7 @@ class MovieDaoTest {
         assertTrue(reviewedMovies.any { it.title == "Reviewed 2" })
     }
 
-    // ===== Complex Scenarios =====
+    // Escenarios complejos
 
     @Test
     fun movieLifecycle_addToLibrary_rate_review_remove() = runTest {
@@ -425,7 +424,7 @@ class MovieDaoTest {
         )
         movieDao.insertMovie(movie)
 
-        // Actuar & Assert - Initial state
+        // Actuar & Assert
         val initial = movieDao.getMovieById(1400)
         assertFalse(initial?.isInLibrary ?: true)
         assertNull(initial?.userRating)
@@ -465,3 +464,4 @@ class MovieDaoTest {
         assertFalse(movieDao.isMovieInLibrary(9999))
     }
 }
+
