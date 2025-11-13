@@ -606,5 +606,9 @@ repository.getLibraryMoviesFlow().collectLatest { movies ->
 This library was developed as part of a Final Year Project (PFC) for DAM 2º (Desarrollo de Aplicaciones Multiplataforma).
 
 ## Resources
-
+- [The Movie Database (TMDb)](https://www.themoviedb.org/) (API gratuita)
+- Comunidad de Android Developers
+- Documentación oficial de Android y Kotlin
+- DevDocs
 ---
+
