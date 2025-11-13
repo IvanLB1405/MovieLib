@@ -9,9 +9,6 @@ import com.movielib.movielib.models.Movie
 /**
  * Base de datos principal usando Room (capa de abstracción sobre SQLite)
  *
- * Room es una librería de persistencia que proporciona una capa de abstracción sobre SQLite
- * para permitir un acceso más robusto a la base de datos mientras se aprovecha el poder de SQLite.
- *
  * ANOTACIÓN @Database:
  * - entities: Array de clases que representan las tablas de la base de datos
  * - version: Número de versión del schema (se incrementa cuando cambia la estructura)
@@ -30,7 +27,7 @@ import com.movielib.movielib.models.Movie
 @Database(
     entities = [Movie::class],  // Lista de todas las tablas (entities) de la BD
     version = 1,                // Versión actual del schema
-    exportSchema = false        // No exportar schema (simplifica desarrollo)
+    exportSchema = false        // No exportar schema
 )
 abstract class MovieDatabase : RoomDatabase() {
 
@@ -48,52 +45,49 @@ abstract class MovieDatabase : RoomDatabase() {
         /**
          * Instancia única de la base de datos (Singleton pattern)
          *
-         * @Volatile asegura que los cambios a INSTANCE sean inmediatamente visibles
-         * para todos los threads. Esto es necesario en entornos multi-hilo para evitar
-         * que un thread vea una versión desactualizada de la variable.
+         * @Volatile asegura que los cambios a INSTANCE sean visibles automaticamente
+         * para todos los threads. Necesario en multi-hilo para evitar
+         * que un hilo vea una versión desactualizada de la variable.
          *
          * Sin @Volatile, un thread podría cachear el valor de INSTANCE y no ver
-         * que otro thread ya la inicializó, creando múltiples instancias.
+         * que otro thread ya la inicializó, creando mas instancias de las que hacen falta.
          */
         @Volatile
         private var INSTANCE: MovieDatabase? = null
 
         /**
-         * Obtiene la instancia única de la base de datos (thread-safe)
+         * Obtiene la instancia única de la base de datos
          *
          * PATRÓN: Double-Checked Locking para inicialización thread-safe
          *
          * FUNCIONAMIENTO:
-         * 1. Primera verificación (sin lock): Si INSTANCE ya existe, la devuelve inmediatamente
+         * 1. Primera verificación: Si INSTANCE ya existe, la devuelve inmediatamente
          * 2. Si es null, entra en bloque sincronizado para evitar que múltiples threads creen instancias
-         * 3. Segunda verificación (con lock): Verifica de nuevo porque otro thread podría haberla creado
+         * 3. Segunda verificación: Verifica de nuevo porque otro thread podría haberla creado
          * 4. Si sigue siendo null, crea la instancia con Room.databaseBuilder
          *
          * SYNCHRONIZED:
          * - Asegura que solo un thread pueda ejecutar el bloque a la vez
-         * - Previene condiciones de carrera donde dos threads podrían crear dos instancias
+         * - Previene que dos threads puedan crear dos instancias
          *
          * @param context Contexto de Android necesario para crear la base de datos
          * @return Instancia única de MovieDatabase
          */
         fun getDatabase(context: Context): MovieDatabase {
-            // Primer check: si ya existe, retornar inmediatamente (fast path)
+            // Primer check: si ya existe, retornar inmediatamente
             return INSTANCE ?: synchronized(this) {
                 // Segundo check: dentro del bloque sincronizado por si otro thread la creó
                 val instance = Room.databaseBuilder(
-                    context.applicationContext,  // Usar applicationContext para evitar memory leaks
+                    context.applicationContext,  // Usar applicationContext para evitar leaks de memoria
                     MovieDatabase::class.java,    // Clase de la base de datos
                     "movie_database"              // Nombre del archivo SQLite en el dispositivo
                 )
                     // IMPORTANTE: fallbackToDestructiveMigration() elimina y recrea la BD
                     // si detecta un cambio de versión sin una migración definida.
-                    // Esto es útil en desarrollo pero PELIGROSO en producción porque
-                    // el usuario perdería todos sus datos (biblioteca, ratings, reseñas).
-                    // Para producción, se deben implementar Migrations adecuadas.
                     .fallbackToDestructiveMigration()
                     .build()
 
-                // Guardar la instancia en INSTANCE para futuras llamadas
+                // Guardamos la instancia en INSTANCE para futuras llamadas
                 INSTANCE = instance
                 // Retornar la instancia recién creada
                 instance
@@ -104,7 +98,7 @@ abstract class MovieDatabase : RoomDatabase() {
          * Versión asíncrona de getDatabase() para compatibilidad con código suspendible
          *
          * En realidad simplemente llama a getDatabase() que ya es seguro llamar desde
-         * cualquier contexto. Esta función existe por consistencia de API.
+         * cualquier contexto.
          *
          * @param context Contexto de Android
          * @return Instancia de la base de datos
@@ -116,18 +110,19 @@ abstract class MovieDatabase : RoomDatabase() {
         /**
          * Cierra la base de datos y limpia la instancia
          *
-         * ÚSALO CON PRECAUCIÓN: Solo para casos específicos como:
+         * Solo para casos específicos como:
          * - Tests unitarios que necesitan reiniciar el estado
          * - Cuando la app se cierra completamente
          *
-         * NO llamar en código normal de producción porque:
+         * NO llamar en código normal porque:
          * - Room gestiona automáticamente las conexiones
          * - Cerrar la BD podría causar crashes si hay operaciones pendientes
-         * - La próxima llamada tendría que recrear toda la instancia (costoso)
+         * - La próxima llamada tendría que recrear toda la instancia
          */
         fun closeDatabase() {
             INSTANCE?.close()  // Cerrar la base de datos si existe
             INSTANCE = null    // Limpiar la referencia para que se pueda crear una nueva
         }
     }
+
 }
