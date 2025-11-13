@@ -224,13 +224,12 @@ Aplicación nativa Android que sirve como **plataforma de crítica de películas
 **Seguridad:**
 - API key en BuildConfig (no hardcodeada)
 - local.properties en .gitignore
-- Logging solo en debug builds
 - HTTPS obligatorio (usesCleartextTraffic=false)
 
 **Documentación:**
-- README.md completo y profesional
-- REQUIREMENTS.md (este documento)
-- DOCUMENTACION_TECNICA.md
+- README.md
+- REQUIREMENTS.md
+- DOCUMENTACION_TECNICA.pdf
 - KDoc en clases principales
 - Comentarios de código
 
@@ -254,7 +253,7 @@ Aplicación nativa Android que sirve como **plataforma de crítica de películas
 
 ### ViewBinding vs DataBinding
 **Decisión:** ViewBinding
-**Razón:** Más ligero, sin procesamiento en build time, suficiente sin MVVM
+**Razón:** Más ligero, sin procesamiento en build time
 
 ### Activities vs Fragments
 **Decisión:** Activities
@@ -262,15 +261,11 @@ Aplicación nativa Android que sirve como **plataforma de crítica de películas
 
 ### Flow vs LiveData
 **Decisión:** Flow
-**Razón:** API moderna de coroutines, mejor integración con Room y Retrofit, más flexible
+**Razón:** API de coroutines, mejor integración con Room y Retrofit, más flexible
 
 ### Singleton manual vs DI
 **Decisión:** Singleton manual (getInstance())
 **Razón:** Simplicidad y suficiente para el alcance del proyecto
-
-### Paginación
-**Decisión:** No implementada
-**Razón:** Complejidad adicional innecesaria para el alcance del proyecto
 
 ### Migrations de Room
 **Decisión:** fallbackToDestructiveMigration()
@@ -344,4 +339,5 @@ Para consultas sobre el proyecto:
 **Documento de Requisitos v1.0** - MovieLib Project
 **Fecha de Entrega:** 2025-11-11
 **Estado:** COMPLETADO
+
 
