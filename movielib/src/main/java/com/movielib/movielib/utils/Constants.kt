@@ -9,14 +9,6 @@ object Constants {
 
     /**
      * API Key de TMDb - Leída de forma segura desde BuildConfig
-     *
-     * Para configurar tu API Key:
-     * 1. Regístrate en https://www.themoviedb.org/
-     * 2. Ve a Settings > API
-     * 3. Solicita una API Key de desarrollador
-     * 4. Añádela en local.properties: TMDB_API_KEY=tu_clave_aqui
-     *
-     * NOTA: local.properties está en .gitignore y NO se commitea al repositorio
      */
     val TMDB_API_KEY: String = BuildConfig.TMDB_API_KEY
 
@@ -59,4 +51,5 @@ object Constants {
             null
         }
     }
+
 }
